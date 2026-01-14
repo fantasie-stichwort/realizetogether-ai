@@ -1,0 +1,128 @@
+---
+// src/components/ChatWidget.astro
+---
+
+<div id="chat-wrapper" class="w-full h-full flex flex-col bg-slate-900/80 backdrop-blur-md md:border md:border-slate-700/50 md:rounded-2xl shadow-2xl overflow-hidden relative transition-all duration-300">
+  
+  <div class="flex-none bg-gradient-to-b from-slate-900/90 to-transparent p-4 z-10 border-b border-slate-800/50">
+      <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+              <span class="relative flex h-3 w-3">
+                <span id="status-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span id="status-dot" class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+              </span>
+              <span id="status-text" class="text-[10px] font-bold tracking-widest text-emerald-400 uppercase">System Online</span>
+          </div>
+          <div class="text-[10px] text-slate-500 font-mono">GEMINI-1.5-FLASH</div>
+      </div>
+  </div>
+
+  <div id="chat-container" class="flex-grow overflow-y-auto p-4 flex flex-col gap-4 scroll-smooth">
+      <div class="self-start max-w-[90%] bg-slate-800 border border-slate-700 text-slate-200 px-4 py-3 rounded-2xl rounded-tl-none text-sm shadow-md">
+          <div class="flex items-center gap-2 mb-1 opacity-70">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span class="text-[10px] font-bold tracking-wider">AI CORE</span>
+          </div>
+          Hallo! Ich kenne Sinans Lebenslauf im Detail. Frag mich nach Skills, Projekten oder Erfahrung.
+      </div>
+  </div>
+
+  <div class="flex-none p-4 bg-slate-900/90 z-20">
+      <div class="relative flex items-center bg-slate-950 border border-slate-800 rounded-xl shadow-inner focus-within:border-blue-500/50 transition-colors">
+          <input 
+              type="text" 
+              id="user-input" 
+              placeholder="Frage eingeben..." 
+              class="w-full bg-transparent text-white px-4 py-3 text-sm focus:outline-none placeholder-slate-600 font-mono"
+          />
+          <button 
+              id="send-btn" 
+              class="mr-2 p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors flex items-center justify-center"
+          >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+              </svg>
+          </button>
+      </div>
+  </div>
+
+</div>
+
+<script>
+  // Chat Logic Module
+  const input = document.getElementById('user-input') as HTMLInputElement;
+  const btn = document.getElementById('send-btn');
+  const chatContainer = document.getElementById('chat-container');
+  const statusText = document.getElementById('status-text');
+  const statusDot = document.getElementById('status-dot');
+  const statusPing = document.getElementById('status-ping');
+
+  const API_URL = "https://8000-firebase-realizetogether-ai-1768386888249.cluster-6vyo4gb53jczovun3dxslzjahs.cloudworkstations.dev/api/chat";
+
+  function setStatus(state: 'online' | 'processing' | 'error') {
+      if(!statusText || !statusDot || !statusPing) return;
+      
+      if(state === 'processing') {
+          statusText.innerText = "PROCESSING...";
+          statusText.className = "text-[10px] font-bold tracking-widest text-yellow-400 uppercase";
+          statusDot.className = "relative inline-flex rounded-full h-3 w-3 bg-yellow-500";
+          statusPing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75";
+      } else if(state === 'error') {
+          statusText.innerText = "CONNECTION ERROR";
+          statusText.className = "text-[10px] font-bold tracking-widest text-red-400 uppercase";
+          statusDot.className = "relative inline-flex rounded-full h-3 w-3 bg-red-500";
+          statusPing.classList.add('hidden');
+      } else {
+          statusText.innerText = "SYSTEM ONLINE";
+          statusText.className = "text-[10px] font-bold tracking-widest text-emerald-400 uppercase";
+          statusDot.className = "relative inline-flex rounded-full h-3 w-3 bg-emerald-500";
+          statusPing.classList.remove('hidden');
+          statusPing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
+      }
+  }
+
+  function appendMessage(text: string, sender: 'user' | 'ai') {
+      if (!chatContainer) return;
+      const div = document.createElement('div');
+      const isUser = sender === 'user';
+      
+      div.className = isUser 
+          ? "self-end max-w-[85%] bg-blue-600/10 border border-blue-500/30 text-blue-100 px-4 py-3 rounded-2xl rounded-tr-none text-sm shadow-md animate-fade-in"
+          : "self-start max-w-[85%] bg-slate-800 border border-slate-700 text-slate-200 px-4 py-3 rounded-2xl rounded-tl-none text-sm shadow-md animate-fade-in";
+
+      const label = isUser 
+          ? `<div class="flex items-center justify-end gap-2 mb-1 opacity-70"><span class="text-[10px] font-bold tracking-wider text-blue-400">YOU</span><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span></div>` 
+          : `<div class="flex items-center gap-2 mb-1 opacity-70"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span><span class="text-[10px] font-bold tracking-wider text-emerald-400">AI CORE</span></div>`;
+
+      div.innerHTML = `${label}<span class="leading-relaxed whitespace-pre-line block">${text}</span>`;
+      chatContainer.appendChild(div);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  async function sendMessage() {
+      if (!input || !input.value.trim()) return;
+      const msg = input.value;
+      input.value = "";
+      
+      appendMessage(msg, 'user');
+      setStatus('processing');
+
+      try {
+          const res = await fetch(API_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ message: msg })
+          });
+          const data = await res.json();
+          appendMessage(data.reply, 'ai');
+          setStatus('online');
+      } catch (e) {
+          appendMessage("Fehler: Keine Verbindung zum Neural Core.", 'ai');
+          setStatus('error');
+      }
+  }
+
+  btn?.addEventListener('click', sendMessage);
+  input?.addEventListener('keypress', (e) => e.key === 'Enter' && sendMessage());
+</script>

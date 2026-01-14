@@ -1,0 +1,96 @@
+---
+// src/components/Navbar.astro
+const links = [
+  { name: 'Home', href: '/' },
+  { name: 'Profil', href: '/about' },
+  { name: 'Lebenslauf', href: '/cv' },
+  { name: 'Projekte', href: '/projects' },
+  { name: 'Kontakt', href: '/contact' },
+];
+
+// Wir prüfen, auf welcher Seite wir gerade sind, um den Link aktiv zu markieren
+const currentPath = Astro.url.pathname;
+---
+
+<nav class="sticky top-0 z-50 w-full bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      
+      <div class="flex-shrink-0">
+        <a href="/" class="font-mono text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 text-transparent bg-clip-text hover:opacity-80 transition-opacity">
+          Sinan.AI
+        </a>
+      </div>
+
+      <div class="hidden md:block">
+        <div class="ml-10 flex items-baseline space-x-4">
+          {links.map((link) => (
+            <a 
+              href={link.href} 
+              class:list={[
+                "px-3 py-2 rounded-md text-sm font-medium transition-all duration-200",
+                currentPath === link.href 
+                  ? "bg-slate-800 text-emerald-400 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]" 
+                  : "text-slate-300 hover:text-white hover:bg-slate-800"
+              ]}
+            >
+              {link.name}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div class="-mr-2 flex md:hidden">
+        <button id="mobile-menu-btn" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-white">
+          <span class="sr-only">Open main menu</span>
+          <svg id="icon-menu" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg id="icon-close" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-slate-800">
+    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+      {links.map((link) => (
+        <a 
+          href={link.href} 
+          class:list={[
+            "block px-3 py-2 rounded-md text-base font-medium",
+             currentPath === link.href 
+              ? "bg-slate-800 text-emerald-400" 
+              : "text-slate-300 hover:text-white hover:bg-slate-800"
+          ]}
+        >
+          {link.name}
+        </a>
+      ))}
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Mobile Menu Toggle Logic
+  const btn = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  const iconMenu = document.getElementById('icon-menu');
+  const iconClose = document.getElementById('icon-close');
+
+  btn?.addEventListener('click', () => {
+    const isHidden = menu?.classList.contains('hidden');
+    
+    if (isHidden) {
+      menu?.classList.remove('hidden');
+      iconMenu?.classList.add('hidden');
+      iconClose?.classList.remove('hidden');
+    } else {
+      menu?.classList.add('hidden');
+      iconMenu?.classList.remove('hidden');
+      iconClose?.classList.add('hidden');
+    }
+  });
+</script>
