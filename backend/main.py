@@ -55,7 +55,13 @@ load_cv()
 
 # 4. AI Setup
 api_key = os.getenv("GOOGLE_API_KEY")
-llm = ChatGoogleGenerativeAI(model="gemini-flash-latest", google_api_key=api_key)
+
+llm = ChatGoogleGenerativeAI(
+    model="gemini-flash-lite-latest",
+    google_api_key=api_key,
+    max_retries=0,       
+    request_timeout=10.0
+)
 
 # 5. Der Prompt (Hier geben wir der AI die Persönlichkeit)
 prompt_template = ChatPromptTemplate.from_template("""
@@ -82,18 +88,22 @@ class ChatRequest(BaseModel):
 async def chat_endpoint(request: ChatRequest):
     print(f"📩 Frage: {request.message}")
     
-    # Hier verbinden wir Prompt + CV + Frage
     chain = prompt_template | llm
     
     try:
         response = chain.invoke({
-            "cv_text": CV_CONTEXT,      # Das Wissen aus dem PDF
-            "user_message": request.message # Die Frage vom Frontend
+            "cv_text": CV_CONTEXT,
+            "user_message": request.message
         })
         return {"reply": response.content}
+        
     except Exception as e:
-        return {"reply": f"Fehler im System: {str(e)}"}
-
-@app.get("/")
-def read_root():
-    return {"status": "AI Recruiter Online", "data_loaded": len(CV_CONTEXT) > 0}
+        error_str = str(e).lower() # Alles in Kleinbuchstaben umwandeln für leichteren Vergleich
+        print(f"❌ Fehler: {error_str}") 
+        
+        # NEU: Wir prüfen auf 429 (Rate Limit) UND auf Timeout/Deadline Fehler
+        if "429" in error_str or "resource_exhausted" in error_str or "timeout" in error_str or "deadline" in error_str:
+            return {"reply": "⚠️ **Kurze Pause!**\nIch habe gerade zu viele Anfragen erhalten oder Google antwortet zu langsam. Bitte warte 30 Sekunden. ⏳"}
+        
+        # Sonstige Fehler
+        return {"reply": f"Ein technisches Problem ist aufgetreten: {str(e)}"}

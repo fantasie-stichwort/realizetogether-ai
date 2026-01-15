@@ -1,0 +1,43 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Sinan.AI - Kontakt">
+  <div class="min-h-[calc(100vh-200px)] flex items-center justify-center p-4">
+    
+    <div class="max-w-2xl w-full bg-slate-900/50 border border-slate-800 rounded-3xl p-8 md:p-12 text-center animate-fade-in shadow-2xl shadow-blue-900/10">
+      
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-500/10 text-blue-400 mb-6 border border-blue-500/20">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+        </svg>
+      </div>
+
+      <h1 class="text-4xl font-bold text-white mb-4">Lass uns sprechen!</h1>
+      
+      <p class="text-slate-400 text-lg mb-8 leading-relaxed">
+        Ich bin aktuell auf der Suche nach neuen Herausforderungen als <br/>
+        <strong class="text-emerald-400">Full Stack Developer</strong> oder <strong class="text-blue-400">Solutions Architect</strong>.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a 
+            href="mailto:deine-email@beispiel.de" 
+            class="px-8 py-4 bg-white text-slate-950 font-bold rounded-xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-2"
+        >
+            Email schreiben
+        </a>
+        
+        <a 
+            href="https://linkedin.com" 
+            target="_blank"
+            class="px-8 py-4 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-colors border border-slate-700 flex items-center justify-center gap-2"
+        >
+            LinkedIn Profil
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+</Layout>

@@ -21,7 +21,7 @@
       <div class="self-start max-w-[90%] bg-slate-800 border border-slate-700 text-slate-200 px-4 py-3 rounded-2xl rounded-tl-none text-sm shadow-md">
           <div class="flex items-center gap-2 mb-1 opacity-70">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              <span class="text-[10px] font-bold tracking-wider">AI CORE</span>
+              <span class="text-[10px] font-bold tracking-wider text-emerald-400">AI CORE</span>
           </div>
           Hallo! Ich kenne Sinans Lebenslauf im Detail. Frag mich nach Skills, Projekten oder Erfahrung.
       </div>
@@ -49,8 +49,10 @@
 </div>
 
 <script>
-  // Chat Logic Module
-  const input = document.getElementById('user-input') as HTMLInputElement;
+  // WICHTIG: Importiere den Markdown Parser
+  import { marked } from 'marked';
+
+  const input = document.getElementById('user-input');
   const btn = document.getElementById('send-btn');
   const chatContainer = document.getElementById('chat-container');
   const statusText = document.getElementById('status-text');
@@ -59,13 +61,14 @@
 
   const API_URL = "https://8000-firebase-realizetogether-ai-1768386888249.cluster-6vyo4gb53jczovun3dxslzjahs.cloudworkstations.dev/api/chat";
 
-  function setStatus(state: 'online' | 'processing' | 'error') {
+  function setStatus(state) {
       if(!statusText || !statusDot || !statusPing) return;
       
       if(state === 'processing') {
           statusText.innerText = "PROCESSING...";
           statusText.className = "text-[10px] font-bold tracking-widest text-yellow-400 uppercase";
           statusDot.className = "relative inline-flex rounded-full h-3 w-3 bg-yellow-500";
+          statusPing.classList.remove('hidden');
           statusPing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75";
       } else if(state === 'error') {
           statusText.innerText = "CONNECTION ERROR";
@@ -81,7 +84,7 @@
       }
   }
 
-  function appendMessage(text: string, sender: 'user' | 'ai') {
+  function appendMessage(text, sender) {
       if (!chatContainer) return;
       const div = document.createElement('div');
       const isUser = sender === 'user';
@@ -94,14 +97,43 @@
           ? `<div class="flex items-center justify-end gap-2 mb-1 opacity-70"><span class="text-[10px] font-bold tracking-wider text-blue-400">YOU</span><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span></div>` 
           : `<div class="flex items-center gap-2 mb-1 opacity-70"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span><span class="text-[10px] font-bold tracking-wider text-emerald-400">AI CORE</span></div>`;
 
-      div.innerHTML = `${label}<span class="leading-relaxed whitespace-pre-line block">${text}</span>`;
+      // 1. Text bereinigen (wie vorher)
+      let safeText = text;
+      if (typeof text === 'object' && text !== null) {
+          if (Array.isArray(text)) {
+              safeText = text.map(item => item.text || JSON.stringify(item)).join('\n');
+          } else {
+              safeText = JSON.stringify(text, null, 2);
+          }
+      }
+      if (!safeText) safeText = "Keine Antwort erhalten.";
+
+      // 2. Markdown parsen! (Nur für AI, User Text bleibt Plain)
+      let contentHtml = safeText;
+      if (!isUser) {
+          // @ts-ignore
+          contentHtml = marked.parse(safeText);
+      }
+
+      // 3. HTML einfügen
+      // Wir fügen eine Klasse 'prose' hinzu, damit Listen und Fettgedrucktes gut aussehen
+      div.innerHTML = `
+        ${label}
+        <div class="leading-relaxed markdown-content ${isUser ? '' : 'text-slate-300'}">
+            ${contentHtml}
+        </div>
+      `;
+
       chatContainer.appendChild(div);
       chatContainer.scrollTop = chatContainer.scrollHeight;
   }
 
-  async function sendMessage() {
+async function sendMessage() {
+      // @ts-ignore
       if (!input || !input.value.trim()) return;
+      // @ts-ignore
       const msg = input.value;
+      // @ts-ignore
       input.value = "";
       
       appendMessage(msg, 'user');
@@ -114,15 +146,61 @@
               credentials: 'include',
               body: JSON.stringify({ message: msg })
           });
+
+          // --- NEU: Spezielle Behandlung für Rate Limits (429) ---
+          if (res.status === 429) {
+              appendMessage("⚠️ Ich denke gerade sehr intensiv nach (Google Rate Limit). Bitte warte 10-20 Sekunden, bevor du die nächste Frage stellst.", 'ai');
+              setStatus('error');
+              return; // Abbruch
+          }
+
+          if (!res.ok) {
+              const errorData = await res.json().catch(() => ({}));
+              throw new Error(errorData.detail ? JSON.stringify(errorData.detail) : `Server Fehler (${res.status})`);
+          }
+
           const data = await res.json();
-          appendMessage(data.reply, 'ai');
+          
+          if (data && data.reply) {
+              appendMessage(data.reply, 'ai');
+          } else {
+              appendMessage("Fehler: Leere Antwort.", 'ai');
+          }
+          
           setStatus('online');
+
       } catch (e) {
-          appendMessage("Fehler: Keine Verbindung zum Neural Core.", 'ai');
+          // @ts-ignore
+          appendMessage(`Systemfehler: ${e.message}`, 'ai');
           setStatus('error');
       }
   }
 
-  btn?.addEventListener('click', sendMessage);
-  input?.addEventListener('keypress', (e) => e.key === 'Enter' && sendMessage());
+  if (btn) btn.addEventListener('click', sendMessage);
+  if (input) input.addEventListener('keypress', (e) => {
+      // @ts-ignore
+      if (e.key === 'Enter') sendMessage();
+  });
 </script>
+
+<style is:global>
+  .markdown-content strong {
+    font-weight: 700;
+    color: #34d399; /* Emerald-400 für Fettgedrucktes */
+  }
+  .markdown-content ul {
+    list-style-type: disc;
+    padding-left: 1.5em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+  .markdown-content li {
+    margin-bottom: 0.25em;
+  }
+  .markdown-content p {
+    margin-bottom: 0.75em;
+  }
+  .markdown-content p:last-child {
+    margin-bottom: 0;
+  }
+</style>

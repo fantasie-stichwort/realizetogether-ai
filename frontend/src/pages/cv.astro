@@ -1,0 +1,64 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TimelineItem from '../components/TimelineItem.astro';
+
+// Daten basierend auf deinem Lebenslauf
+const stations = [
+  {
+    year: "Seit 2024",
+    title: "AI Solutions Architect (Beispiel)",
+    company: "RealizeTogether AI",
+    description: "Entwicklung von skalierbaren RAG-Systemen und Integration von LLMs in Enterprise-Prozesse.",
+    tags: ["Python", "FastAPI", "LangChain", "Astro"]
+  },
+  {
+    year: "2018 - 2024",
+    title: "Senior Full Stack Engineer",
+    company: "Ceyoniq GmbH",
+    description: "Spezialisierung auf Frontend-Architektur. Einführung von Web Components (Lit) und Vue.js. Migration von Legacy-Systemen und Optimierung von CI/CD Pipelines.",
+    tags: ["TypeScript", "Vue.js", "Lit", "Docker", "Java", "Playwright"]
+  },
+  {
+    year: "2015 - 2018",
+    title: "Software Developer",
+    company: "Materna IPS",
+    description: "Entwicklung von Self-Service-Kiosk-Systemen für Flughäfen weltweit (Java/Web). Fokus auf Hardware-Integration und performante UIs.",
+    tags: ["Java", "Spring Boot", "Hardware Integration", "AngularJS"]
+  },
+  {
+    year: "2010 - 2015",
+    title: "Diplom Informatik",
+    company: "TU Dortmund",
+    description: "Schwerpunkt Software Engineering und Intelligente Systeme. Abschluss als Diplom-Informatiker.",
+    tags: ["Studium", "Diplom", "Algorithmik"]
+  }
+];
+---
+
+<Layout title="Sinan.AI - Lebenslauf">
+  <div class="max-w-4xl mx-auto px-4 py-12 md:py-16">
+    
+    <div class="text-center mb-16 space-y-4 animate-fade-in">
+      <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-400 text-transparent bg-clip-text pb-2">
+        Experience Timeline
+      </h1>
+      <p class="text-slate-400 text-lg max-w-2xl mx-auto">
+        15+ Jahre Erfahrung in Software Engineering, Architektur und Full-Stack Entwicklung.
+      </p>
+    </div>
+
+    <div class="relative animate-fade-in-up">
+       {stations.map((station, index) => (
+         <TimelineItem 
+           year={station.year}
+           title={station.title}
+           company={station.company}
+           description={station.description}
+           tags={station.tags}
+           isLast={index === stations.length - 1}
+         />
+       ))}
+    </div>
+
+  </div>
+</Layout>
