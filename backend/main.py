@@ -13,17 +13,12 @@ import base64
 load_dotenv()
 app = FastAPI()
 
-origins = [
-    "http://localhost:4321",                      # Für lokale Entwicklung
-    "http://localhost:3000",                      # Falls Astro manchmal auf 3000 läuft
-    "https://sinan.realizetogether.com",          # DEINE LIVE DOMAIN (Wichtig!)
-    "https://sinan-backend.onrender.com"          # Das Backend selbst
-]
+origin_regex = r"https://(.*\.)?realizetogether\.com|http://localhost:\d+"
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,      # Statt ["*"] nehmen wir die Liste
-    allow_credentials=True,     # Das darf bleiben, weil wir oben exakte Domains haben
+    allow_origin_regex=origin_regex, # Regex statt statischer Liste
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
