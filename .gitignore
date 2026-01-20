@@ -7,4 +7,7 @@ frontend/dist/
 .astro/
 
 .env
-.DS_Store
+.DS_Store.venv/
+.venv/
+.env
+__pycache__/
