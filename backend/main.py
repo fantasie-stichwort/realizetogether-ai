@@ -36,9 +36,13 @@ origins = [
     "https://realizetogether-ai.onrender.com", 
 ]
 
+# NEU: Regex, der deine Cloud-Umgebung (und Localhost Ports) erlaubt
+origin_regex = r"https://.*\.cloudworkstations\.dev|http://localhost:\d+"
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,     
+    allow_origins=origins,      # Deine feste Liste
+    allow_origin_regex=origin_regex, # <--- WICHTIG: Erlaubt die dynamische Cloud-URL
     allow_credentials=True,    
     allow_methods=["*"],       
     allow_headers=["*"],       
