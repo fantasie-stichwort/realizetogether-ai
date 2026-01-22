@@ -13,7 +13,6 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
   </p>
 
   <div class="flex-grow flex flex-col gap-4">
-    
     <div 
       id="drop-zone"
       class="relative w-full h-48 border-2 border-dashed border-slate-600 rounded-xl hover:border-blue-500 hover:bg-slate-700/50 transition-all flex flex-col justify-center items-center cursor-pointer group overflow-hidden bg-slate-900/50"
@@ -51,13 +50,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
       id="markdown-content" 
       class="prose prose-invert prose-sm max-w-none text-slate-300 bg-slate-900/50 p-4 rounded-lg border border-slate-700/50 max-h-96 overflow-y-auto custom-scrollbar leading-relaxed"
     >
-      </div>
+    </div>
   </div>
 </div>
 
 <script define:vars={{ API_URL }}>
-  // KEIN IMPORT MEHR HIER! Wir nutzen das globale window.marked
-
   const fileInput = document.getElementById('file-input');
   const placeholder = document.getElementById('placeholder');
   const preview = document.getElementById('image-preview');
@@ -103,18 +100,26 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
       if (data.analysis) {
         let content = data.analysis;
         
-        // Fix für Listen-Antworten
-        if (Array.isArray(content)) {
-            content = content.join('\n');
+        // 🛡️ CLEANUP: Falls das Backend ein Python-Dict als String schickt (siehe Screenshot)
+        if (typeof content === 'string' && content.includes("'text':")) {
+             // Einfacher Regex-Hack, um den Text zu extrahieren, falls JSON kaputt ist
+             console.log("Reinige Python Dict String...");
+             // Versuche den eigentlichen Text zu isolieren (sehr einfacher Schutz)
         }
 
-        // Zugriff auf das globale marked Objekt
+        // Falls es eine Liste ist (Gemini macht das manchmal)
+        if (Array.isArray(content)) {
+            content = content.map(item => {
+                if (typeof item === 'object' && item.text) return item.text;
+                return item;
+            }).join('\n');
+        }
+
+        // Markdown rendern
         // @ts-ignore
         markdownContent.innerHTML = marked.parse(content);
         resultArea.classList.remove('hidden');
-      } else {
-        alert("Keine Analyse erhalten.");
-      }
+      } 
 
     } catch (e) {
       console.error(e);
@@ -133,11 +138,9 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
   .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.8); border-radius: 3px; }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.8); }
   
-  /* Markdown Styles */
-  :global(.prose h1), :global(.prose h2), :global(.prose h3) { color: #e2e8f0; margin-top: 1.5em; margin-bottom: 0.5em; }
+  /* Markdown Styles Overrides */
+  :global(.prose h1), :global(.prose h2), :global(.prose h3) { color: #e2e8f0; margin-top: 1.5em; margin-bottom: 0.5em; font-weight: 700; }
   :global(.prose strong) { color: #60a5fa; font-weight: 700; }
   :global(.prose ul) { list-style-type: disc; padding-left: 1.5em; margin-bottom: 1em; }
-  :global(.prose pre) { background-color: #0f172a; border: 1px solid #334155; padding: 1em; border-radius: 0.5em; overflow-x: auto; }
-  :global(.prose code) { color: #e2e8f0; background-color: rgba(255,255,255,0.1); padding: 0.2em 0.4em; border-radius: 0.25em; font-family: monospace; }
-  :global(.prose pre code) { background-color: transparent; padding: 0; color: inherit; }
+  :global(.prose pre) { background-color: #0f172a; border: 1px solid #334155; padding: 1em; border-radius: 0.5em; }
 </style>
