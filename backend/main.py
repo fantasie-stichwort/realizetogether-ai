@@ -212,7 +212,16 @@ Erstelle eine Analyse im Markdown-Format:
         )
         
         response = vision_llm.invoke([message])
-        return {"analysis": response.content}
+        
+        # --- FIX: LISTE ZU STRING KONVERTIEREN ---
+        # Manchmal gibt Gemini eine Liste von Textblöcken zurück.
+        # Wir kleben sie hier sicherheitshalber zusammen.
+        analysis_text = response.content
+        if isinstance(analysis_text, list):
+            print("⚠️ Antwort war eine Liste, wird zusammengefügt...")
+            analysis_text = "".join([str(item) for item in analysis_text])
+            
+        return {"analysis": analysis_text}
 
     except Exception as e:
         print(f"❌ Vision Fehler: {e}")
@@ -221,36 +230,11 @@ Erstelle eine Analyse im Markdown-Format:
              return {"analysis": "⚠️ **Rate Limit erreicht.** Google's Vision AI braucht eine kurze Pause."}
         return {"analysis": f"Fehler bei der Bildanalyse: {str(e)}"}
 
-# --- ANALYSE (Structured Output) ---
-@app.post("/api/analyze")
-async def analyze_endpoint(request: AnalyzeRequest):
-    print(f"🕵️ Analysiere Sentiment für: {request.text[:50]}...")
-
-    # 1. Wir zwingen das LLM in unser Schema
-    structured_llm = chat_llm.with_structured_output(SentimentAnalysis)
-
-    # 2. Der Prompt
-    prompt = ChatPromptTemplate.from_template("""
-    Analysiere den folgenden Text gründlich.
-    Fülle das vorgegebene Schema exakt aus.
+# Optional: Root-Endpunkt für Health-Checks
+@app.get("/")
+async def root():
+    return {"status": "Server läuft! 🚀", "endpoints": ["/api/chat", "/api/vision", "/api/analyze"]}
     
-    TEXT: {user_text}
-    """)
-
-    # 3. Kette bilden
-    chain = prompt | structured_llm
-
-    try:
-        # 4. Ausführen
-        result = chain.invoke({"user_text": request.text})
-        
-        print(f"📊 Ergebnis: {result.score} | {result.emotion}")
-        return result 
-
-    except Exception as e:
-        print(f"❌ Analyse-Fehler: {e}")
-        return {"error": str(e)}
-
 # ==========================================
 # 6. STARTUP
 # ==========================================
