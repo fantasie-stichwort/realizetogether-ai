@@ -76,7 +76,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
 
     try {
       // Fetch an dein Backend
-      const res = await fetch(`${API_URL}/api/analyze`, {
+      const res = await fetch(`${API_URL}/api/sentiment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text })
