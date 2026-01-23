@@ -115,6 +115,7 @@ const text = lang === 'en' ? t.en : t.de;
     
     const formData = new FormData();
     formData.append('file', selectedFile);
+    formData.append('language', lang);
 
     try {
       const res = await fetch(`${API_URL}/api/vision`, {

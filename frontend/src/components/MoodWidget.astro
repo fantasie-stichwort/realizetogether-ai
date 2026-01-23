@@ -97,7 +97,7 @@ const text = lang === 'en' ? t.en : t.de;
       const res = await fetch(`${API_URL}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({ text, language: lang })
       });
       
       const data = await res.json();

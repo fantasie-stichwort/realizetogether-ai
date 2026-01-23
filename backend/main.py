@@ -1,8 +1,7 @@
-from fastapi import FastAPI, File, UploadFile, Request
+from fastapi import FastAPI, File, UploadFile, Request, Form
 from fastapi.middleware.cors import CORSMiddleware
-# WICHTIG: Wir nutzen jetzt NUR NOCH das Standard-Pydantic (v2)
 from pydantic import BaseModel, Field 
-from typing import Literal
+from typing import Literal, Optional
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage
@@ -11,21 +10,21 @@ import os
 import base64
 
 # ==========================================
-# 1. SETUP & KONFIGURATION
+# 1. SETUP
 # ==========================================
 load_dotenv()
 app = FastAPI()
 
-# DEBUG: Zeigt uns im Render-Log, wer anfragt
+# DEBUG: Origin Logging
 @app.middleware("http")
 async def log_origin(request: Request, call_next):
     origin = request.headers.get("origin")
     if origin:
-        print(f"🔔 Eingehender Request von Origin: {origin}")
+        print(f"🔔 Request from Origin: {origin}")
     response = await call_next(request)
     return response
 
-# CORS - Konfiguration
+# CORS
 origins = [
     "http://localhost:4321",
     "http://localhost:3000",
@@ -35,164 +34,124 @@ origins = [
     "https://www.realizetogether.com",
     "https://realizetogether-ai.onrender.com", 
 ]
-
-# NEU: Regex, der deine Cloud-Umgebung (und Localhost Ports) erlaubt
 origin_regex = r"https://.*\.cloudworkstations\.dev|http://localhost:\d+"
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,      # Deine feste Liste
-    allow_origin_regex=origin_regex, # <--- WICHTIG: Erlaubt die dynamische Cloud-URL
+    allow_origins=origins,
+    allow_origin_regex=origin_regex,
     allow_credentials=True,    
     allow_methods=["*"],       
     allow_headers=["*"],       
 )
 
 # ==========================================
-# 2. DATEN & LOGIK (Lebenslauf)
+# 2. DATA (CV)
 # ==========================================
 CV_CONTEXT = ""
-
 def load_cv():
-    """Liest die Markdown-Datei aus dem data-Ordner ein."""
     global CV_CONTEXT
     file_path = os.path.join("data", "cv.md")
-
     try:
         if not os.path.exists(file_path):
-            print(f"⚠️ WARNUNG: Datei unter '{file_path}' nicht gefunden!")
-            CV_CONTEXT = "Kein Lebenslauf hinterlegt."
+            CV_CONTEXT = "Kein Lebenslauf gefunden."
             return
-
-        print(f"📂 Lade Lebenslauf von: {file_path} ...")
-        
         with open(file_path, "r", encoding="utf-8") as f:
             CV_CONTEXT = f.read()
-            
-        print(f"✅ Lebenslauf geladen! ({len(CV_CONTEXT)} Zeichen)")
-        
+        print(f"✅ CV loaded! ({len(CV_CONTEXT)} chars)")
     except Exception as e:
-        print(f"❌ Fehler beim Laden der Datei: {e}")
-        CV_CONTEXT = "Fehler beim Laden des Lebenslaufs."
-
-# Beim Starten einmal ausführen
+        print(f"❌ Error loading CV: {e}")
+        CV_CONTEXT = "Error loading CV."
 load_cv()
 
 # ==========================================
-# 3. AI SETUP (Modelle)
+# 3. AI MODELS
 # ==========================================
 api_key = os.getenv("GOOGLE_API_KEY")
-
-# Modell für den Chat
-chat_llm = ChatGoogleGenerativeAI(
-    model="gemini-flash-lite-latest", 
-    google_api_key=api_key,
-    max_retries=0,       
-    request_timeout=10.0
-)
-
-# Modell für Vision
-vision_llm = ChatGoogleGenerativeAI(
-    model="gemini-flash-latest", 
-    google_api_key=api_key,
-    max_retries=0,
-    request_timeout=20.0 
-)
+chat_llm = ChatGoogleGenerativeAI(model="gemini-flash-lite-latest", google_api_key=api_key, max_retries=0, request_timeout=10.0)
+vision_llm = ChatGoogleGenerativeAI(model="gemini-flash-latest", google_api_key=api_key, max_retries=0, request_timeout=20.0)
 
 # ==========================================
-# 4. DATENMODELLE (Pydantic v2)
+# 4. DATA MODELS
 # ==========================================
-
-# Modell für Chat-Requests
 class ChatRequest(BaseModel):
     message: str
     language: str = "de"
 
-# Modell für Sentiment-Analyse Input
 class AnalyzeRequest(BaseModel):
     text: str
+    language: str = "de"  # NEU: Sprache optional, default deutsch
 
-# Modell für Sentiment-Analyse OUTPUT
 class SentimentAnalysis(BaseModel):
-    score: float = Field(description="Score zwischen -1.0 und 1.0")
-    emotion: Literal['freude', 'wut', 'trauer', 'neutral', 'angst'] = Field(description="Primäre Emotion")
-    suggestion: str = Field(description="Ein kurzer Tipp zur Verbesserung")
+    score: float = Field(description="Score -1.0 to 1.0")
+    # Wir behalten die internen IDs (freude, wut...), mappen aber die Ausgabe im Frontend
+    emotion: Literal['freude', 'wut', 'trauer', 'neutral', 'angst'] = Field(description="Primary emotion key")
+    suggestion: str = Field(description="Short suggestion for improvement")
 
 # ==========================================
-# 5. ENDPUNKTE (API Routes)
+# 5. ENDPOINTS
 # ==========================================
 
 # --- CHAT ---
 @app.post("/api/chat")
 async def chat_endpoint(request: ChatRequest):
-    print(f"📩 Frage: {request.message} | Sprache: {request.language}")
+    print(f"📩 Chat: {request.message} | Lang: {request.language}")
     
     if request.language == "en":
-        prompt_template = ChatPromptTemplate.from_template("""
-        You are the professional AI assistant for Sinan. 
-        Use the following resume to answer questions:
-
-        RESUME DATA:
-        {cv_text}
-
-        RULES:
-        - Answer in ENGLISH.
-        - Keep it short, professional, and helpful.
-        - If the info is not in the resume, say honestly that you don't know.
-        - Speak as an assistant ("Sinan has...", "He has...").
-
-        USER QUESTION: 
-        {user_message}
-        """)
+        template = """You are Sinan's AI assistant. Use this resume: {cv_text}. 
+        Answer in ENGLISH. Short, professional. 
+        User Question: {user_message}"""
     else:
-        prompt_template = ChatPromptTemplate.from_template("""
-        Du bist der professionelle AI-Assistent von Sinan. 
-        Nutze den folgenden Lebenslauf, um Fragen zu beantworten:
+        template = """Du bist Sinans AI Assistent. Nutze diesen CV: {cv_text}. 
+        Antworte auf DEUTSCH. Kurz, professionell. 
+        Frage: {user_message}"""
 
-        LEBENSLAUF DATEN:
-        {cv_text}
-
-        REGELN:
-        - Antworte kurz, professionell und hilfreich.
-        - Wenn die Info nicht im Lebenslauf steht, sag ehrlich, dass du es nicht weißt.
-        - Du sprichst als Assistent ("Sinan hat...", "Er hat...").
-
-        FRAGE DES USERS: 
-        {user_message}
-        """)
-
-    chain = prompt_template | chat_llm
-    
+    chain = ChatPromptTemplate.from_template(template) | chat_llm
     try:
-        response = chain.invoke({
-            "cv_text": CV_CONTEXT,
-            "user_message": request.message
-        })
-        return {"reply": response.content}
-        
+        res = chain.invoke({"cv_text": CV_CONTEXT, "user_message": request.message})
+        return {"reply": res.content}
     except Exception as e:
-        error_str = str(e).lower()
-        print(f"❌ Fehler: {error_str}") 
-        if "429" in error_str or "resource_exhausted" in error_str:
-            return {"reply": "⚠️ **Kurze Pause!** Zu viele Anfragen. Bitte warte kurz."}
-        return {"reply": f"Technischer Fehler: {str(e)}"}
+        return {"reply": "Error/Fehler: " + str(e)}
 
 # --- VISION ---
+# NEU: language Parameter via Form() empfangen
 @app.post("/api/vision")
-async def vision_endpoint(file: UploadFile = File(...)):
-    print(f"🖼️ Bild empfangen: {file.filename}")
+async def vision_endpoint(file: UploadFile = File(...), language: str = Form("de")):
+    print(f"🖼️ Vision: {file.filename} | Lang: {language}")
     try:
         contents = await file.read()
         image_b64 = base64.b64encode(contents).decode("utf-8")
         
-        message = HumanMessage(
-            content=[
-                {"type": "text", "text": "Analysiere diesen Screenshot (UX/UI, Design, Code). Antworte in Markdown."},
-                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_b64}"}}
-            ]
-        )
+        # PROMPT UMSCHALTEN
+        if language == "en":
+            prompt_text = """
+            You are a Senior UX/UI Designer. Analyze this screenshot.
+            Output in Markdown:
+            1. **First Impression:** (Positive/Negative)
+            2. **UX & Usability:** Buttons, Navigation?
+            3. **Design:** Colors, Whitespace, Typography.
+            4. **Improvements:** 3 concrete points.
+            5. **Bonus Code:** A short Tailwind CSS snippet.
+            """
+        else:
+            prompt_text = """
+            Du bist ein Senior UX/UI Designer. Analysiere diesen Screenshot.
+            Antworte in Markdown:
+            1. **Erster Eindruck:** (Positiv/Negativ)
+            2. **UX & Usability:** Buttons erkennbar?
+            3. **Design:** Farben, Whitespace, Typo.
+            4. **Verbesserungsvorschläge:** 3 konkrete Punkte.
+            5. **Bonus Code:** Ein kurzer Tailwind CSS Schnipsel.
+            """
+
+        message = HumanMessage(content=[
+            {"type": "text", "text": prompt_text},
+            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_b64}"}}
+        ])
+        
         response = vision_llm.invoke([message])
         
+        # Cleanup List responses
         analysis_text = response.content
         if isinstance(analysis_text, list):
             analysis_text = "".join([str(item) for item in analysis_text])
@@ -200,18 +159,24 @@ async def vision_endpoint(file: UploadFile = File(...)):
         return {"analysis": analysis_text}
 
     except Exception as e:
-        print(f"❌ Vision Fehler: {e}")
-        return {"analysis": f"Fehler bei der Bildanalyse: {str(e)}"}
+        print(f"❌ Vision Error: {e}")
+        return {"analysis": f"Error: {str(e)}"}
 
-# --- SENTIMENT / ANALYZE (DER FEHLENDE ENDPUNKT) ---
+# --- SENTIMENT ---
 @app.post("/api/analyze")
 async def analyze_sentiment(request: AnalyzeRequest):
-    print(f"📊 Sentiment Analyse für: {request.text[:50]}...")
+    print(f"📊 Sentiment ({request.language}): {request.text[:30]}...")
     
     structured_llm = chat_llm.with_structured_output(SentimentAnalysis)
     
+    # SYSTEM PROMPT UMSCHALTEN
+    if request.language == "en":
+        sys_prompt = "You are a sentiment analysis expert. Analyze the text. The 'suggestion' field MUST be in English. For 'emotion', strictly select the best fitting key from the allowed list (even if they are German words)."
+    else:
+        sys_prompt = "Du bist ein Experte für Sentiment-Analyse. Analysiere den Text und gib JSON zurück. Das Feld 'suggestion' soll auf Deutsch sein."
+
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "Du bist ein Experte für Sentiment-Analyse. Analysiere den Text und gib JSON zurück."),
+        ("system", sys_prompt),
         ("human", "Text: {text}")
     ])
     
@@ -221,14 +186,9 @@ async def analyze_sentiment(request: AnalyzeRequest):
         result = chain.invoke({"text": request.text})
         return result
     except Exception as e:
-        print(f"❌ Analyse Fehler: {e}")
+        print(f"❌ Analyze Error: {e}")
         return {"error": str(e)}
 
-# Optional: Root-Endpunkt für Health-Checks
-@app.get("/")
-async def root():
-    return {"status": "Server läuft! 🚀", "endpoints": ["/api/chat", "/api/vision", "/api/analyze"]}
-    
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
