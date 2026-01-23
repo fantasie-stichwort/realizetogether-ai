@@ -5,26 +5,21 @@ const currentLang = Astro.currentLocale || 'de';
 const currentPath = Astro.url.pathname;
 const targetLang = currentLang === 'de' ? 'en' : 'de';
 
-// ROBUSSTE LOGIK:
-// Wir splitten den Pfad in Teile, anstatt Regex/Replace auf den ganzen String anzuwenden.
-// 1. Pfad zerlegen (z.B. "/en/demos/vision" -> ["en", "demos", "vision"])
 const segments = currentPath.split('/').filter(Boolean);
 
-// 2. Prüfen, ob das erste Segment ein Sprachkürzel ist (de oder en)
+// Wenn das erste Segment 'en' oder 'de' ist, entfernen wir es, um den reinen Slug zu bekommen
 if (segments.length > 0 && (segments[0] === 'en' || segments[0] === 'de')) {
-  segments.shift(); // Entferne das Sprachkürzel vorne
+  segments.shift(); 
 }
 
-// 3. Den Rest wieder zusammenbauen (das ist der reine "Slug")
 const slug = segments.join('/');
-
-// 4. Neue URL generieren
 const targetUrl = getRelativeLocaleUrl(targetLang, slug);
 ---
 
 <a
   href={targetUrl}
-  class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-700 bg-slate-900/50 text-xs font-bold text-slate-300 hover:text-white hover:border-emerald-500 transition-all uppercase tracking-wider"
+  class="flex items-center justify-center w-10 h-8 rounded-md border border-slate-700 bg-slate-900/50 text-xs font-bold text-slate-300 hover:text-white hover:border-emerald-500 hover:bg-slate-800 transition-all uppercase tracking-wider"
+  aria-label={targetLang === 'en' ? 'Switch to English' : 'Zu Deutsch wechseln'}
 >
-  {targetLang === 'en' ? '🇺🇸 EN' : '🇩🇪 DE'}
+  {targetLang === 'en' ? 'EN' : 'DE'}
 </a>

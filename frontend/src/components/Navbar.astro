@@ -1,99 +1,101 @@
 ---
-const currentPath = Astro.url.pathname;
-const isEn = currentPath.startsWith('/en');
+import LanguagePicker from './LanguagePicker.astro';
+import { getRelativeLocaleUrl } from 'astro:i18n';
 
-// Logik für den Sprachwechsel (Bleibt auf der aktuellen Seite, wechselt nur den Ordner)
-let deLink = currentPath.replace('/en', '');
-if (deLink === '') deLink = '/'; 
+const lang = Astro.currentLocale || 'de';
 
-let enLink = '/en' + currentPath;
-if (isEn) enLink = currentPath; 
-if (currentPath === '/') enLink = '/en'; 
-
-// Navigation Links: Hier nutzen wir wieder ECHTE PFADE (keine #Anker)
-const nav = {
-  home: isEn ? "/en" : "/",
-  profile: isEn ? "/en/profile" : "/profil",       // War vorher wahrscheinlich /profil
-  cv: isEn ? "/en/cv" : "/lebenslauf",             // Passt zu deinem Hero-Button
-  projects: isEn ? "/en/projects" : "/projekte",   // Passt zu deinem Hero-Button
-  ai: isEn ? "/en/ai" : "/ai",
-  contact: isEn ? "/en/contact" : "/kontakt",
-  
-  // Labels
-  l_home: "Home",
-  l_profile: isEn ? "Profile" : "Profil",
-  l_cv: isEn ? "Resume" : "Lebenslauf",
-  l_projects: isEn ? "Projects" : "Projekte",
-  l_ai: "AI Showcase",
-  l_contact: isEn ? "Contact" : "Kontakt"
+// Texte basierend auf Sprache
+const t = {
+  home: lang === 'de' ? 'Home' : 'Home',
+  about: lang === 'de' ? 'Profil' : 'Profile',
+  cv: lang === 'de' ? 'Lebenslauf' : 'Resume',
+  projects: lang === 'de' ? 'Projekte' : 'Projects',
+  showcase: lang === 'de' ? 'AI Showcase' : 'AI Showcase', 
+  contact: lang === 'de' ? 'Kontakt' : 'Contact'
 };
+
+const links = [
+  { name: t.home, href: getRelativeLocaleUrl(lang, '/') },
+  { name: t.about, href: getRelativeLocaleUrl(lang, 'about') },
+  { name: t.cv, href: getRelativeLocaleUrl(lang, 'cv') },
+  { name: t.projects, href: getRelativeLocaleUrl(lang, 'projects') },
+  { name: t.showcase, href: getRelativeLocaleUrl(lang, 'ai') }, 
+  { name: t.contact, href: getRelativeLocaleUrl(lang, 'contact') }
+];
+
+const currentPath = Astro.url.pathname;
 ---
 
-<nav class="fixed w-full z-50 top-0 transition-all duration-300 backdrop-blur-md bg-slate-900/90 border-b border-white/5" id="navbar">
+<nav class="sticky top-0 z-50 w-full bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-20">
+    <div class="flex items-center justify-between h-16">
       
       <div class="flex-shrink-0">
-        <a href={nav.home} class="text-2xl font-bold font-mono tracking-tighter hover:text-blue-400 transition-colors cursor-pointer">
-          <span class="text-blue-500">Sinan</span>.AI
+        <a
+          href={getRelativeLocaleUrl(lang, '/')}
+          class="font-mono text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 text-transparent bg-clip-text hover:opacity-80 transition-opacity"
+        >
+          Sinan.AI
         </a>
       </div>
-      
-      <div class="hidden md:block">
-        <div class="ml-10 flex items-baseline space-x-6">
-          <a href={nav.home} class="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">{nav.l_home}</a>
-          <a href={nav.profile} class="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">{nav.l_profile}</a>
-          <a href={nav.cv} class="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">{nav.l_cv}</a>
-          <a href={nav.projects} class="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">{nav.l_projects}</a>
-          
-          <a href={nav.ai} class="bg-blue-600/10 text-blue-400 border border-blue-500/50 hover:bg-blue-600 hover:text-white px-3 py-2 rounded-md text-sm font-bold transition-all shadow-lg shadow-blue-900/20">
-            {nav.l_ai}
-          </a>
 
-          <a href={nav.contact} class="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">{nav.l_contact}</a>
-
-          <div class="ml-6 flex items-center gap-3 border-l border-slate-700 pl-6 font-mono text-sm">
-            <a 
-              href={deLink} 
-              class={`transition-colors ${!isEn ? 'text-blue-400 font-bold cursor-default pointer-events-none' : 'text-slate-500 hover:text-white cursor-pointer'}`}
-            >
-              DE
-            </a>
-            <span class="text-slate-700">|</span>
-            <a 
-              href={enLink} 
-              class={`transition-colors ${isEn ? 'text-blue-400 font-bold cursor-default pointer-events-none' : 'text-slate-500 hover:text-white cursor-pointer'}`}
-            >
-              EN
-            </a>
-          </div>
-
+      <div class="hidden md:flex items-center gap-6">
+        <div class="flex items-baseline space-x-4">
+          {
+            links.map((link) => (
+              <a
+                href={link.href}
+                class:list={[
+                  'px-3 py-2 rounded-md text-sm font-medium transition-all duration-200',
+                  currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href))
+                    ? 'bg-slate-800 text-emerald-400 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                ]}
+              >
+                {link.name}
+              </a>
+            ))
+          }
         </div>
+        <LanguagePicker />
       </div>
-      
-      <div class="-mr-2 flex md:hidden">
-        <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none" id="mobile-menu-btn">
-          <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+
+      <div class="-mr-2 flex md:hidden gap-4 items-center">
+        <LanguagePicker />
+        <button
+          id="mobile-menu-btn"
+          type="button"
+          class="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none"
+        >
+          <span class="sr-only">Open main menu</span>
+          <svg id="icon-menu" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+          <svg id="icon-close" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         </button>
       </div>
     </div>
   </div>
 
-  <div class="md:hidden hidden bg-slate-900 border-b border-slate-800 absolute w-full" id="mobile-menu">
+  <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-slate-800">
     <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-      <a href={nav.home} class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{nav.l_home}</a>
-      <a href={nav.profile} class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{nav.l_profile}</a>
-      <a href={nav.cv} class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{nav.l_cv}</a>
-      <a href={nav.projects} class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{nav.l_projects}</a>
-      <a href={nav.ai} class="text-blue-400 font-bold block px-3 py-2 rounded-md text-base">{nav.l_ai}</a>
-      <a href={nav.contact} class="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">{nav.l_contact}</a>
-      
-      <div class="flex items-center gap-6 px-3 py-4 border-t border-slate-800 mt-2">
-         <a href={deLink} class={`${!isEn ? 'text-blue-400 font-bold' : 'text-slate-500'}`}>DE</a>
-         <a href={enLink} class={`${isEn ? 'text-blue-400 font-bold' : 'text-slate-500'}`}>EN</a>
-      </div>
+      {
+        links.map((link) => (
+          <a
+            href={link.href}
+            class:list={[
+              'block px-3 py-2 rounded-md text-base font-medium',
+              currentPath === link.href
+                ? 'bg-slate-800 text-emerald-400'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800'
+            ]}
+          >
+            {link.name}
+          </a>
+        ))
+      }
     </div>
   </div>
 </nav>
@@ -101,10 +103,19 @@ const nav = {
 <script>
   const btn = document.getElementById('mobile-menu-btn');
   const menu = document.getElementById('mobile-menu');
+  const iconMenu = document.getElementById('icon-menu');
+  const iconClose = document.getElementById('icon-close');
 
-  if (btn && menu) {
-    btn.addEventListener('click', () => {
-      menu.classList.toggle('hidden');
-    });
-  }
+  btn?.addEventListener('click', () => {
+    const isHidden = menu?.classList.contains('hidden');
+    if (isHidden) {
+      menu?.classList.remove('hidden');
+      iconMenu?.classList.add('hidden');
+      iconClose?.classList.remove('hidden');
+    } else {
+      menu?.classList.add('hidden');
+      iconMenu?.classList.remove('hidden');
+      iconClose?.classList.add('hidden');
+    }
+  });
 </script>

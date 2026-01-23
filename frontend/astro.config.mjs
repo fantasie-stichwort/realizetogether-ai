@@ -12,8 +12,6 @@ export default defineConfig({
     defaultLocale: "de",
     locales: ["de", "en"],
     routing: {
-      // WICHTIG: false bedeutet, Deutsch ist unter "/" (nicht "/de/")
-      // Englisch ist unter "/en/"
       prefixDefaultLocale: false 
     }
   }

@@ -114,7 +114,6 @@ async def chat_endpoint(request: ChatRequest):
         return {"reply": "Error/Fehler: " + str(e)}
 
 # --- VISION ---
-# NEU: language Parameter via Form() empfangen
 @app.post("/api/vision")
 async def vision_endpoint(file: UploadFile = File(...), language: str = Form("de")):
     print(f"🖼️ Vision: {file.filename} | Lang: {language}")
