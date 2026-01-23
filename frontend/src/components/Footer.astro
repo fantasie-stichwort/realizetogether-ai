@@ -5,9 +5,9 @@ const lang = Astro.currentLocale || 'de';
 
 const routes = {
   home: { de: '/', en: '/' },
-  about: { de: 'profil', en: 'about' },
+  about: { de: 'profil', en: 'profile' }, // <--- NEU: 'profile'
   projects: { de: 'projekte', en: 'projects' },
-  cv: { de: 'lebenslauf', en: 'resume' }, // <--- HIER 'resume'
+  cv: { de: 'lebenslauf', en: 'resume' },
   contact: { de: 'kontakt', en: 'contact' },
   privacy: { de: 'datenschutz', en: 'privacy' },
   imprint: { de: 'impressum', en: 'imprint' }
@@ -22,9 +22,9 @@ const t = {
   legal: lang === 'de' ? 'Rechtliches' : 'Legal',
   links: {
     home: 'Home',
-    about: lang === 'de' ? 'Profil' : 'About Me',
+    about: lang === 'de' ? 'Profil' : 'Profile', // Label passt jetzt zur URL
     projects: lang === 'de' ? 'Projekte' : 'Projects',
-    cv: lang === 'de' ? 'Lebenslauf' : 'Resume', // <--- "Resume" als Label
+    cv: lang === 'de' ? 'Lebenslauf' : 'Resume',
     contact: lang === 'de' ? 'Kontakt' : 'Contact',
     privacy: lang === 'de' ? 'Datenschutz' : 'Privacy Policy',
     imprint: lang === 'de' ? 'Impressum' : 'Imprint'

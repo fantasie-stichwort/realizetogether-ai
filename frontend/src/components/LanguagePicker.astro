@@ -11,21 +11,21 @@ if (segments.length > 0 && (segments[0] === 'en' || segments[0] === 'de')) {
 }
 const slug = segments.join('/');
 
-// Mapping für die URL-Übersetzung
+// Mapping Updates
 const routeTranslations: Record<string, string> = {
     // DE -> EN
-    'lebenslauf': 'resume', // <--- WICHTIG: zu 'resume'
+    'profil': 'profile', // <--- NEU
+    'lebenslauf': 'resume',
     'projekte': 'projects',
-    'profil': 'about',
     'kontakt': 'contact',
     'impressum': 'imprint',
     'datenschutz': 'privacy',
     
     // EN -> DE
-    'resume': 'lebenslauf', // <--- WICHTIG: von 'resume'
-    'cv': 'lebenslauf',     // (Fallback, falls alte Links existieren)
+    'profile': 'profil', // <--- NEU
+    'about': 'profil',   // Fallback
+    'resume': 'lebenslauf',
     'projects': 'projekte',
-    'about': 'profil',
     'contact': 'kontakt',
     'imprint': 'impressum',
     'privacy': 'datenschutz'

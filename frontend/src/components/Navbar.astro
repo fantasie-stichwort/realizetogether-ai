@@ -4,11 +4,11 @@ import { getRelativeLocaleUrl } from 'astro:i18n';
 
 const lang = Astro.currentLocale || 'de';
 
-// ROUTING LOGIK: Hier definieren wir die Pärchen
+// ROUTING: Hier das Update bei 'about'
 const routes = {
   home: { de: '/', en: '/' },
-  about: { de: 'profil', en: 'about' },
-  cv: { de: 'lebenslauf', en: 'resume' }, // <--- NEU: 'resume' statt 'cv'
+  about: { de: 'profil', en: 'profile' }, // <--- NEU: 'profile' statt 'about'
+  cv: { de: 'lebenslauf', en: 'resume' },
   projects: { de: 'projekte', en: 'projects' },
   ai: { de: 'ai', en: 'ai' },
   contact: { de: 'kontakt', en: 'contact' }
@@ -16,7 +16,7 @@ const routes = {
 
 const t = {
   home: 'Home',
-  about: lang === 'de' ? 'Profil' : 'Profile',
+  about: lang === 'de' ? 'Profil' : 'Profile', // Label stimmt jetzt zur URL
   cv: lang === 'de' ? 'Lebenslauf' : 'Resume',
   projects: lang === 'de' ? 'Projekte' : 'Projects',
   showcase: 'AI Showcase',
