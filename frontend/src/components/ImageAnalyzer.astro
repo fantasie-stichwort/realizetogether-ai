@@ -1,67 +1,94 @@
 ---
+const { lang = 'de' } = Astro.props;
 const API_URL = import.meta.env.PUBLIC_API_URL;
+
+const t = {
+  de: {
+    title: "Vision Analyse",
+    desc: "Lade einen Screenshot hoch. Die KI analysiert UX, Design und Code.",
+    drop: "Bild hierhin ziehen oder klicken",
+    btn: "Analysieren",
+    result: "Analyse Ergebnis:",
+    tech: "Lädt Bilder hoch, encodiert sie zu Base64 und analysiert UI/UX-Elemente semantisch."
+  },
+  en: {
+    title: "Vision Analysis",
+    desc: "Upload a screenshot. The AI analyzes UX, design, and code quality.",
+    drop: "Drag & drop image here or click",
+    btn: "Analyze",
+    result: "Analysis Result:",
+    tech: "Uploads images, encodes them to Base64, and semantically analyzes UI/UX elements."
+  }
+};
+
+const text = lang === 'en' ? t.en : t.de;
 ---
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" is:inline></script>
 
 <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl h-full flex flex-col">
   <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
-    👁️ Vision Analyse
+    👁️ {text.title}
   </h3>
   <p class="text-slate-400 text-sm mb-4">
-    Lade einen Screenshot hoch. Die KI analysiert UX, Design und Code.
+    {text.desc}
   </p>
 
   <div class="flex-grow flex flex-col gap-4">
     <div 
-      id="drop-zone"
+      id={`drop-zone-${lang}`}
       class="relative w-full h-48 border-2 border-dashed border-slate-600 rounded-xl hover:border-blue-500 hover:bg-slate-700/50 transition-all flex flex-col justify-center items-center cursor-pointer group overflow-hidden bg-slate-900/50"
     >
-      <input type="file" id="file-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+      <input type="file" id={`file-input-${lang}`} accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
       
-      <div id="placeholder" class="text-center p-4 transition-opacity duration-300">
+      <div id={`placeholder-${lang}`} class="text-center p-4 transition-opacity duration-300">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-500 mx-auto mb-2 group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
-        <p class="text-slate-400 text-sm font-medium">Bild hierhin ziehen oder klicken</p>
+        <p class="text-slate-400 text-sm font-medium">{text.drop}</p>
         <p class="text-slate-600 text-xs mt-1">PNG, JPG (max 4MB)</p>
       </div>
 
-      <img id="image-preview" class="absolute inset-0 w-full h-full object-contain bg-slate-900 hidden z-0 p-2" />
+      <img id={`image-preview-${lang}`} class="absolute inset-0 w-full h-full object-contain bg-slate-900 hidden z-0 p-2" />
     </div>
 
     <button 
-      id="vision-btn"
+      id={`vision-btn-${lang}`}
       disabled
       class="w-full bg-purple-600 hover:bg-purple-500 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-colors flex justify-center items-center gap-2"
     >
-      <span>Analysieren</span>
-      <svg id="vision-spinner" class="animate-spin h-4 w-4 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <span>{text.btn}</span>
+      <svg id={`vision-spinner-${lang}`} class="animate-spin h-4 w-4 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
     </button>
   </div>
 
-  <div id="vision-result" class="hidden mt-6 pt-4 border-t border-slate-700 animate-fade-in">
-    <h4 class="text-sm font-bold text-purple-400 mb-2 uppercase tracking-wide">Analyse Ergebnis:</h4>
+  <div id={`vision-result-${lang}`} class="hidden mt-6 pt-4 border-t border-slate-700 animate-fade-in">
+    <h4 class="text-sm font-bold text-purple-400 mb-2 uppercase tracking-wide">{text.result}</h4>
     
     <div 
-      id="markdown-content" 
+      id={`markdown-content-${lang}`} 
       class="prose prose-invert prose-sm max-w-none text-slate-300 bg-slate-900/50 p-4 rounded-lg border border-slate-700/50 max-h-96 overflow-y-auto custom-scrollbar leading-relaxed"
     >
     </div>
   </div>
 </div>
 
-<script define:vars={{ API_URL }}>
-  const fileInput = document.getElementById('file-input');
-  const placeholder = document.getElementById('placeholder');
-  const preview = document.getElementById('image-preview');
-  const btn = document.getElementById('vision-btn');
-  const spinner = document.getElementById('vision-spinner');
-  const resultArea = document.getElementById('vision-result');
-  const markdownContent = document.getElementById('markdown-content');
+<div class="mt-4 p-4 bg-slate-900/50 rounded-lg border border-slate-800 text-sm text-slate-400">
+  <strong class="text-purple-400">Technik:</strong> Google Gemini Vision Model. <br/>
+  {text.tech}
+</div>
+
+<script define:vars={{ API_URL, lang }}>
+  const fileInput = document.getElementById(`file-input-${lang}`);
+  const placeholder = document.getElementById(`placeholder-${lang}`);
+  const preview = document.getElementById(`image-preview-${lang}`);
+  const btn = document.getElementById(`vision-btn-${lang}`);
+  const spinner = document.getElementById(`vision-spinner-${lang}`);
+  const resultArea = document.getElementById(`vision-result-${lang}`);
+  const markdownContent = document.getElementById(`markdown-content-${lang}`);
 
   let selectedFile = null;
 
@@ -99,31 +126,19 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
       
       if (data.analysis) {
         let content = data.analysis;
-        
-        // 🛡️ CLEANUP: Falls das Backend ein Python-Dict als String schickt (siehe Screenshot)
-        if (typeof content === 'string' && content.includes("'text':")) {
-             // Einfacher Regex-Hack, um den Text zu extrahieren, falls JSON kaputt ist
-             console.log("Reinige Python Dict String...");
-             // Versuche den eigentlichen Text zu isolieren (sehr einfacher Schutz)
+        if (typeof content === 'string' && content.trim().startsWith("{") && content.includes("'text':")) {
+             const match = content.match(/'text':\s*'(.*?)'(\s*,\s*'|$)/s);
+             if (match && match[1]) content = match[1].replace(/\\n/g, '\n');
         }
+        if (Array.isArray(content)) content = content.map(item => typeof item === 'object' && item.text ? item.text : item).join('\n');
 
-        // Falls es eine Liste ist (Gemini macht das manchmal)
-        if (Array.isArray(content)) {
-            content = content.map(item => {
-                if (typeof item === 'object' && item.text) return item.text;
-                return item;
-            }).join('\n');
-        }
-
-        // Markdown rendern
         // @ts-ignore
         markdownContent.innerHTML = marked.parse(content);
         resultArea.classList.remove('hidden');
       } 
-
     } catch (e) {
       console.error(e);
-      alert("Fehler: " + e.message);
+      alert("Error: " + e.message);
     } finally {
       btn.disabled = false;
       spinner.classList.add('hidden');
@@ -132,13 +147,10 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
 </script>
 
 <style>
-  /* Scrollbar Styling */
   .custom-scrollbar::-webkit-scrollbar { width: 6px; }
   .custom-scrollbar::-webkit-scrollbar-track { background: rgba(30, 41, 59, 0.5); }
   .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.8); border-radius: 3px; }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.8); }
-  
-  /* Markdown Styles Overrides */
   :global(.prose h1), :global(.prose h2), :global(.prose h3) { color: #e2e8f0; margin-top: 1.5em; margin-bottom: 0.5em; font-weight: 700; }
   :global(.prose strong) { color: #60a5fa; font-weight: 700; }
   :global(.prose ul) { list-style-type: disc; padding-left: 1.5em; margin-bottom: 1em; }
