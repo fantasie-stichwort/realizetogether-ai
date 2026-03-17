@@ -71,7 +71,7 @@ const text = lang === 'en' ? t.en : t.de;
     <button 
       id={`vision-btn-${lang}`}
       disabled
-      class="w-full bg-purple-600 hover:bg-purple-500 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-colors flex justify-center items-center gap-2"
+      class="w-full bg-purple-600 hover:bg-purple-500 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-colors flex justify-center items-center gap-2 mt-auto"
     >
       <span>{text.btn}</span>
       <svg id={`vision-spinner-${lang}`} class="animate-spin h-4 w-4 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -120,12 +120,11 @@ const text = lang === 'en' ? t.en : t.de;
        </div>
        <pre class="text-xs text-green-400 font-mono overflow-x-auto custom-scrollbar p-2 bg-black/50 rounded"><code id={`tailwind-code-${lang}`}></code></pre>
     </div>
+    <div class="mt-auto pt-6 border-t border-slate-700/50 text-[10px] text-slate-500 uppercase tracking-widest flex items-center gap-2">
+      <span class="text-purple-500/50">●</span>
+      <strong class="text-slate-400 font-semibold">{text.techLabel}</strong> {text.tech}
+    </div>
   </div>
-</div>
-
-<div class="mt-4 p-4 bg-slate-900/50 rounded-lg border border-slate-800 text-sm text-slate-400">
-  <strong class="text-purple-400">{text.techLabel}</strong> <br/>
-  {text.tech}
 </div>
 
 <script define:vars={{ API_URL, lang, text }}>

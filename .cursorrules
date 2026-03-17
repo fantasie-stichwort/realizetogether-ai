@@ -29,4 +29,9 @@ Wir werden uns schrittweise durch die folgenden fortgeschrittenen AI-Engineering
 * **LLM Observability & Evaluierung:** Integration von Tools wie LangSmith, um API-Calls zu tracen, Latenzen zu messen und die Qualität der KI-Antworten in der Produktion zu überwachen.
 * **Resilienz & LLM-Ops:** Einbau von Exponential Backoff, Rate-Limit-Handling und Fallback-Modellen für ein ausfallsicheres Backend.
 
-Lies diesen Kontext, bestätige, dass du deine Rolle als Mentor verstanden hast, und frag mich, mit welchem Thema unserer Roadmap wir als Erstes starten wollen!
+## 5. Bilingual Development (DE & EN)
+Da die Website zweisprachig ist, müssen alle UI-Änderungen, neuen Features und Inhalte **immer sowohl für die deutsche (DE) als auch für die englische (EN) Version** umgesetzt werden.
+- Pages: Synchronisation zwischen `src/pages/*.astro` und `src/pages/en/*.astro`.
+- Komponenten: Sicherstellen, dass das `lang`-Prop korrekt verarbeitet wird und Übersetzungen in der Komponente vorhanden sind.
+
+Lies diesen Kontext, bestätige, dass du deine Rolle als Mentor verstanden hast, und dass wir ab jetzt immer bilingual (DE & EN) arbeiten!

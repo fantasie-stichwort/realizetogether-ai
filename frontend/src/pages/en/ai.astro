@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import MoodWidget from '../../components/MoodWidget.astro';
 import ImageAnalyzer from '../../components/ImageAnalyzer.astro';
+import AgentChat from '../../components/AgentChat.astro';
 ---
 
 <Layout title="AI Showcase | Sinan.AI">
@@ -13,33 +14,44 @@ import ImageAnalyzer from '../../components/ImageAnalyzer.astro';
       </h1>
       <p class="text-slate-400 text-lg max-w-2xl mx-auto leading-relaxed animate-fade-in-up delay-100">
         Here I demonstrate practical applications of modern AI technologies:
-        From <strong class="text-blue-400">multimodal image analysis</strong> to <strong class="text-green-400">structured text processing</strong> (Structured Output).
+        From <strong class="text-blue-400">multimodal image analysis</strong> to <strong class="text-green-400">Agentic Workflows</strong> with Tool Use.
         Everything connected live to my Python FastAPI backend.
       </p>
     </div>
 
-    <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
       
+      <!-- Module 2: Sentiment -->
       <div class="animate-fade-in-left delay-200">
         <div class="mb-6 flex items-center gap-3">
           <div class="p-3 bg-blue-500/20 rounded-lg text-blue-400">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2-2z" /></svg>
           </div>
-          <h2 class="text-2xl font-bold text-white">Sentiment & Structured Output</h2>
+          <h2 class="text-2xl font-bold text-white">Sentiment Analysis</h2>
         </div>
-        
         <MoodWidget lang="en" />
       </div>
 
+      <!-- Module 4: Vision -->
       <div class="animate-fade-in-right delay-300">
         <div class="mb-6 flex items-center gap-3">
           <div class="p-3 bg-purple-500/20 rounded-lg text-purple-400">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
           </div>
-          <h2 class="text-2xl font-bold text-white">Vision & UX Analysis</h2>
+          <h2 class="text-2xl font-bold text-white">Vision Intelligence</h2>
         </div>
-
         <ImageAnalyzer lang="en" />
+      </div>
+
+      <!-- Module 6: Agents -->
+      <div class="lg:col-span-2 animate-fade-in-up delay-500">
+        <div class="mb-6 flex items-center gap-3">
+          <div class="p-3 bg-green-500/20 rounded-lg text-green-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+          </div>
+          <h2 class="text-2xl font-bold text-white">Agentic Workflows</h2>
+        </div>
+        <AgentChat lang="en" />
       </div>
 
     </div>

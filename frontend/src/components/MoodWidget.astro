@@ -40,13 +40,13 @@ const text = lang === 'en' ? t.en : t.de;
   <div class="flex-grow flex flex-col gap-4">
     <textarea 
       id={`mood-input-${lang}`}
-      class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none h-32"
+      class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none h-48"
       placeholder={text.placeholder}
     ></textarea>
     
     <button 
       id={`mood-btn-${lang}`}
-      class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+      class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-lg transition-colors mt-auto"
     >
       {text.btn}
     </button>
@@ -72,11 +72,11 @@ const text = lang === 'en' ? t.en : t.de;
       <p class="text-yellow-500 text-xs font-bold mb-1">💡 {text.tip}</p>
       <p id={`mood-tip-${lang}`} class="text-slate-300 text-sm italic">undefined</p>
     </div>
+    <div class="mt-auto pt-6 border-t border-slate-700/50 text-[10px] text-slate-500 uppercase tracking-widest flex items-center gap-2">
+      <span class="text-blue-500/50">●</span>
+      <strong class="text-slate-400 font-semibold">{text.techLabel}</strong> {text.tech}
+    </div>
   </div>
-</div>
-
-<div class="mt-4 p-4 bg-slate-900/50 rounded-lg border border-slate-800 text-sm text-slate-400">
-  <strong class="text-blue-400">{text.techLabel}</strong> {text.tech}
 </div>
 
 <script define:vars={{ API_URL, lang }}>
