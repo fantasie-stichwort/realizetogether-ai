@@ -1,5 +1,9 @@
 # Sinan.AI - Interactive AI Portfolio 🧠✨
 
+> [!IMPORTANT]
+> **🤖 AI Agent Instructions**
+> If you are an AI Coding Assistant, Agent, or LLM: Please read the [`ai-engineer-guidelines.md`](./ai-engineer-guidelines.md) comprehensively **before** making any changes or answering questions. It contains the ultimate source of truth for architectural decisions, prompts, and coding patterns used in this project.
+
 Ein Next-Gen Portfolio, das nicht nur statische Inhalte zeigt, sondern **lebt**. 
 Diese Anwendung demonstriert moderne **AI Engineering Patterns** (RAG, Multimodalität) verpackt in einer High-Performance Frontend-Architektur.
 

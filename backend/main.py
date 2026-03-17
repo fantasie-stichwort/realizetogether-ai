@@ -88,6 +88,13 @@ class SentimentAnalysis(BaseModel):
     emotion: Literal['freude', 'wut', 'trauer', 'neutral', 'angst'] = Field(description="Primary emotion key")
     suggestion: str = Field(description="Short suggestion for improvement")
 
+class VisionAnalysis(BaseModel):
+    impression: Literal['positive', 'negative', 'neutral'] = Field(description="First impression of the design")
+    usability_score: int = Field(description="Score from 1 to 10 for usability")
+    design_feedback: str = Field(description="Feedback on colors, whitespace, typography")
+    improvements: list[str] = Field(description="Exactly 3 concrete actionable improvements")
+    tailwind_code: Optional[str] = Field(description="A short Tailwind CSS snippet if applicable, else empty string")
+
 # ==========================================
 # 5. ENDPOINTS
 # ==========================================
@@ -121,26 +128,26 @@ async def vision_endpoint(file: UploadFile = File(...), language: str = Form("de
         contents = await file.read()
         image_b64 = base64.b64encode(contents).decode("utf-8")
         
+        structured_llm = vision_llm.with_structured_output(VisionAnalysis)
+        
         # PROMPT UMSCHALTEN
         if language == "en":
             prompt_text = """
-            You are a Senior UX/UI Designer. Analyze this screenshot.
-            Output in Markdown:
-            1. **First Impression:** (Positive/Negative)
-            2. **UX & Usability:** Buttons, Navigation?
-            3. **Design:** Colors, Whitespace, Typography.
-            4. **Improvements:** 3 concrete points.
-            5. **Bonus Code:** A short Tailwind CSS snippet.
+            You are a Senior UX/UI Designer. Analyze this screenshot and return structured JSON.
+            1. 'impression': Your first impression (positive, negative, neutral).
+            2. 'usability_score': Score from 1 to 10.
+            3. 'design_feedback': General feedback on design elements.
+            4. 'improvements': 3 concrete points to improve.
+            5. 'tailwind_code': A short Tailwind CSS snippet if applicable.
             """
         else:
             prompt_text = """
-            Du bist ein Senior UX/UI Designer. Analysiere diesen Screenshot.
-            Antworte in Markdown:
-            1. **Erster Eindruck:** (Positiv/Negativ)
-            2. **UX & Usability:** Buttons erkennbar?
-            3. **Design:** Farben, Whitespace, Typo.
-            4. **Verbesserungsvorschläge:** 3 konkrete Punkte.
-            5. **Bonus Code:** Ein kurzer Tailwind CSS Schnipsel.
+            Du bist ein Senior UX/UI Designer. Analysiere diesen Screenshot und antworte strikt in JSON.
+            1. 'impression': Dein erster Eindruck (positive, negative, neutral) - der Wert MUSS auf Englisch sein!
+            2. 'usability_score': Punktzahl von 1 bis 10.
+            3. 'design_feedback': Feedback zu Design-Elementen (auf Deutsch).
+            4. 'improvements': 3 konkrete Verbesserungsvorschläge (auf Deutsch).
+            5. 'tailwind_code': Ein kurzes Tailwind CSS Snippet (falls anwendbar).
             """
 
         message = HumanMessage(content=[
@@ -148,18 +155,12 @@ async def vision_endpoint(file: UploadFile = File(...), language: str = Form("de
             {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_b64}"}}
         ])
         
-        response = vision_llm.invoke([message])
-        
-        # Cleanup List responses
-        analysis_text = response.content
-        if isinstance(analysis_text, list):
-            analysis_text = "".join([str(item) for item in analysis_text])
-            
-        return {"analysis": analysis_text}
+        response = structured_llm.invoke([message])
+        return response
 
     except Exception as e:
         print(f"❌ Vision Error: {e}")
-        return {"analysis": f"Error: {str(e)}"}
+        return {"error": str(e)}
 
 # --- SENTIMENT ---
 @app.post("/api/analyze")

@@ -9,8 +9,15 @@ const t = {
     drop: "Bild hierhin ziehen oder klicken",
     btn: "Analysieren",
     result: "Analyse Ergebnis:",
-    techLabel: "Technik:", // <--- DE
-    tech: "Google Gemini Vision Model. Lädt Bilder hoch, encodiert sie zu Base64 und analysiert UI/UX-Elemente semantisch."
+    techLabel: "Technik:",
+    tech: "Google Gemini Vision Model. Lädt Bilder hoch, encodiert sie zu Base64 und analysiert UI/UX-Elemente semantisch.",
+    score: "Usability Score",
+    feedback: "Design Feedback",
+    improvements: "Verbesserungen",
+    code: "Tailwind Snippet",
+    imp_positive: "Positiv",
+    imp_neutral: "Neutral",
+    imp_negative: "Negativ"
   },
   en: {
     title: "Vision Analysis",
@@ -18,15 +25,22 @@ const t = {
     drop: "Drag & drop image here or click",
     btn: "Analyze",
     result: "Analysis Result:",
-    techLabel: "Tech Stack:", // <--- EN
-    tech: "Google Gemini Vision Model. Uploads images, encodes them to Base64, and semantically analyzes UI/UX elements."
+    techLabel: "Tech Stack:",
+    tech: "Google Gemini Vision Model. Uploads images, encodes them to Base64, and semantically analyzes UI/UX elements.",
+    score: "Usability Score",
+    feedback: "Design Feedback",
+    improvements: "Improvements",
+    code: "Tailwind Snippet",
+    imp_positive: "Positive",
+    imp_neutral: "Neutral",
+    imp_negative: "Negative"
   }
 };
 
 const text = lang === 'en' ? t.en : t.de;
 ---
 
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" is:inline></script>
+
 
 <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl h-full flex flex-col">
   <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
@@ -67,13 +81,44 @@ const text = lang === 'en' ? t.en : t.de;
     </button>
   </div>
 
-  <div id={`vision-result-${lang}`} class="hidden mt-6 pt-4 border-t border-slate-700 animate-fade-in">
-    <h4 class="text-sm font-bold text-purple-400 mb-2 uppercase tracking-wide">{text.result}</h4>
+  <div id={`vision-result-${lang}`} class="hidden mt-6 pt-4 border-t border-slate-700 animate-fade-in flex flex-col gap-4">
+    <div class="flex items-center justify-between">
+      <h4 class="text-sm font-bold text-purple-400 uppercase tracking-wide">{text.result}</h4>
+      <div id={`impression-badge-${lang}`} class="px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-600">
+        Neutral
+      </div>
+    </div>
     
-    <div 
-      id={`markdown-content-${lang}`} 
-      class="prose prose-invert prose-sm max-w-none text-slate-300 bg-slate-900/50 p-4 rounded-lg border border-slate-700/50 max-h-96 overflow-y-auto custom-scrollbar leading-relaxed"
-    >
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700/50">
+         <h5 class="text-xs text-slate-400 uppercase tracking-wider mb-1">{text.score}</h5>
+         <div class="flex items-baseline gap-1">
+           <span id={`score-value-${lang}`} class="text-3xl font-extrabold text-white">0</span>
+           <span class="text-slate-500 font-medium">/ 10</span>
+         </div>
+         <div class="w-full bg-slate-800 rounded-full h-1.5 mt-3">
+           <div id={`score-bar-${lang}`} class="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-1.5 rounded-full" style="width: 0%"></div>
+         </div>
+      </div>
+    </div>
+
+    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700/50 text-slate-300 text-sm leading-relaxed">
+       <h5 class="text-xs text-slate-400 uppercase tracking-wider mb-2">{text.feedback}</h5>
+       <p id={`feedback-text-${lang}`}></p>
+    </div>
+
+    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700/50">
+       <h5 class="text-xs text-slate-400 uppercase tracking-wider mb-2">{text.improvements}</h5>
+       <ul id={`improvements-list-${lang}`} class="list-disc filter drop-shadow-sm pl-5 text-sm text-slate-300 space-y-1">
+       </ul>
+    </div>
+    
+    <div id={`code-container-${lang}`} class="hidden bg-slate-900/80 p-4 rounded-lg border border-slate-700 h-max">
+       <div class="flex items-center justify-between mb-2">
+         <h5 class="text-xs text-slate-400 uppercase tracking-wider">{text.code}</h5>
+         <span class="text-[10px] text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded border border-blue-400/20">Tailwind CSS</span>
+       </div>
+       <pre class="text-xs text-green-400 font-mono overflow-x-auto custom-scrollbar p-2 bg-black/50 rounded"><code id={`tailwind-code-${lang}`}></code></pre>
     </div>
   </div>
 </div>
@@ -83,14 +128,22 @@ const text = lang === 'en' ? t.en : t.de;
   {text.tech}
 </div>
 
-<script define:vars={{ API_URL, lang }}>
+<script define:vars={{ API_URL, lang, text }}>
   const fileInput = document.getElementById(`file-input-${lang}`);
   const placeholder = document.getElementById(`placeholder-${lang}`);
   const preview = document.getElementById(`image-preview-${lang}`);
   const btn = document.getElementById(`vision-btn-${lang}`);
   const spinner = document.getElementById(`vision-spinner-${lang}`);
   const resultArea = document.getElementById(`vision-result-${lang}`);
-  const markdownContent = document.getElementById(`markdown-content-${lang}`);
+  
+  // Element Refs
+  const impressionBadge = document.getElementById(`impression-badge-${lang}`);
+  const scoreValue = document.getElementById(`score-value-${lang}`);
+  const scoreBar = document.getElementById(`score-bar-${lang}`);
+  const feedbackText = document.getElementById(`feedback-text-${lang}`);
+  const improvementsList = document.getElementById(`improvements-list-${lang}`);
+  const codeContainer = document.getElementById(`code-container-${lang}`);
+  const tailwindCode = document.getElementById(`tailwind-code-${lang}`);
 
   let selectedFile = null;
 
@@ -127,18 +180,50 @@ const text = lang === 'en' ? t.en : t.de;
 
       const data = await res.json();
       
-      if (data.analysis) {
-        let content = data.analysis;
-        if (typeof content === 'string' && content.trim().startsWith("{") && content.includes("'text':")) {
-             const match = content.match(/'text':\s*'(.*?)'(\s*,\s*'|$)/s);
-             if (match && match[1]) content = match[1].replace(/\\n/g, '\n');
+      if (data && !data.error) {
+        // Impression Badge
+        impressionBadge.className = "px-3 py-1 rounded-full text-xs font-bold border";
+        if(data.impression === 'positive') {
+          impressionBadge.classList.add('bg-green-500/20', 'text-green-400', 'border-green-500/30');
+          impressionBadge.textContent = text.imp_positive;
+        } else if(data.impression === 'negative') {
+          impressionBadge.classList.add('bg-red-500/20', 'text-red-400', 'border-red-500/30');
+          impressionBadge.textContent = text.imp_negative;
+        } else {
+           impressionBadge.classList.add('bg-slate-500/20', 'text-slate-400', 'border-slate-500/30');
+           impressionBadge.textContent = text.imp_neutral;
         }
-        if (Array.isArray(content)) content = content.map(item => typeof item === 'object' && item.text ? item.text : item).join('\n');
 
-        // @ts-ignore
-        markdownContent.innerHTML = marked.parse(content);
+        // Score
+        const score = data.usability_score || 0;
+        scoreValue.textContent = score;
+        scoreBar.style.width = `${(score / 10) * 100}%`;
+
+        // Texts
+        feedbackText.textContent = data.design_feedback || '';
+        
+        // Improvements Loop
+        improvementsList.innerHTML = '';
+        if(data.improvements && Array.isArray(data.improvements)) {
+          data.improvements.forEach(imp => {
+            const li = document.createElement('li');
+            li.textContent = imp;
+            improvementsList.appendChild(li);
+          });
+        }
+
+        // Code block
+        if(data.tailwind_code && data.tailwind_code.trim() !== '') {
+          tailwindCode.textContent = data.tailwind_code.replace(/```[a-z]*\n?/g, '').trim();
+          codeContainer.classList.remove('hidden');
+        } else {
+          codeContainer.classList.add('hidden');
+        }
+
         resultArea.classList.remove('hidden');
-      } 
+      } else {
+        alert("Server Error: " + (data.error || "Unknown error"));
+      }
     } catch (e) {
       console.error(e);
       alert("Error: " + e.message);
