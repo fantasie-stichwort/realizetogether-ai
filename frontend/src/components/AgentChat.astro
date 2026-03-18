@@ -26,7 +26,13 @@ const t = {
 const text = lang === 'en' ? t.en : t.de;
 ---
 
-<div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl h-full flex flex-col">
+<div
+  class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl h-full flex flex-col"
+  data-api-url={API_URL}
+  data-lang={lang}
+  data-thinking={text.thinking}
+  data-btn={text.btn}
+>
   <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-3">
     <div class="p-2 bg-green-500/20 rounded-lg text-green-400">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -68,7 +74,7 @@ const text = lang === 'en' ? t.en : t.de;
     
     <div class="bg-black/40 p-5 rounded-2xl border border-slate-700/50 relative overflow-hidden group">
       <div class="absolute top-0 left-0 w-1 h-full bg-green-500/50 group-hover:bg-green-500 transition-colors"></div>
-      <p id={`agent-reply-${lang}`} class="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap"></p>
+      <div id={`agent-reply-${lang}`} class="agent-prose text-slate-200 text-sm leading-relaxed"></div>
     </div>
 
     <div class="mt-auto pt-6 border-t border-slate-700/50 text-[10px] text-slate-500 uppercase tracking-widest flex items-center gap-2">
@@ -78,51 +84,68 @@ const text = lang === 'en' ? t.en : t.de;
   </div>
 </div>
 
-<script define:vars={{ API_URL, lang, text }}>
-  const input = document.getElementById(`agent-input-${lang}`);
-  const btn = document.getElementById(`agent-btn-${lang}`);
-  const spinner = document.getElementById(`agent-spinner-${lang}`);
-  const resultArea = document.getElementById(`agent-result-area-${lang}`);
-  const replyText = document.getElementById(`agent-reply-${lang}`);
+<script>
+  import { marked } from 'marked';
 
-  btn.addEventListener('click', async () => {
-    const message = input.value.trim();
-    if (!message) return;
+  document.querySelectorAll<HTMLElement>('[data-lang]').forEach((container) => {
+    const API_URL = container.dataset.apiUrl!;
+    const lang = container.dataset.lang!;
+    const thinkingText = container.dataset.thinking!;
+    const btnText = container.dataset.btn!;
 
-    btn.disabled = true;
-    spinner.classList.remove('hidden');
-    const originalBtnText = btn.querySelector('span').textContent;
-    btn.querySelector('span').textContent = text.thinking;
+    const input = container.querySelector<HTMLTextAreaElement>(`#agent-input-${lang}`)!;
+    const btn = container.querySelector<HTMLButtonElement>(`#agent-btn-${lang}`)!;
+    const spinner = container.querySelector<HTMLElement>(`#agent-spinner-${lang}`)!;
+    const resultArea = container.querySelector<HTMLElement>(`#agent-result-area-${lang}`)!;
+    const replyText = container.querySelector<HTMLElement>(`#agent-reply-${lang}`)!;
 
-    try {
-      const res = await fetch(`${API_URL}/api/agent`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, language: lang })
-      });
+    btn.addEventListener('click', async () => {
+      const message = input.value.trim();
+      if (!message) return;
 
-      const data = await res.json();
-      
-      if (data.reply) {
-        replyText.textContent = data.reply;
-        resultArea.classList.remove('hidden');
-        resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      btn.disabled = true;
+      spinner.classList.remove('hidden');
+      btn.querySelector('span')!.textContent = thinkingText;
+
+      try {
+        const res = await fetch(`${API_URL}/api/agent`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message, language: lang })
+        });
+
+        const data = await res.json();
+
+        if (data.reply) {
+          let replyContent = '';
+          if (Array.isArray(data.reply)) {
+            replyContent = data.reply
+              .filter((block: { type: string }) => block.type === 'text')
+              .map((block: { text: string }) => block.text)
+              .join('\n');
+          } else {
+            replyContent = data.reply;
+          }
+          replyText.innerHTML = await marked.parse(replyContent);
+          resultArea.classList.remove('hidden');
+          resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      } catch (e) {
+        console.error(e);
+        alert("Error: " + (e as Error).message);
+      } finally {
+        btn.disabled = false;
+        spinner.classList.add('hidden');
+        btn.querySelector('span')!.textContent = btnText;
       }
-    } catch (e) {
-      console.error(e);
-      alert("Error: " + e.message);
-    } finally {
-      btn.disabled = false;
-      spinner.classList.add('hidden');
-      btn.querySelector('span').textContent = originalBtnText;
-    }
-  });
+    });
 
-  // Allow Cmd+Enter to send
-  input.addEventListener('keydown', (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-      btn.click();
-    }
+    input.addEventListener('keydown', (e: Event) => {
+      const ke = e as KeyboardEvent;
+      if ((ke.metaKey || ke.ctrlKey) && ke.key === 'Enter') {
+        btn.click();
+      }
+    });
   });
 </script>
 
@@ -134,4 +157,13 @@ const text = lang === 'en' ? t.en : t.de;
   .animate-fade-in {
     animation: fade-in 0.4s ease-out forwards;
   }
+
+  .agent-prose p { margin-bottom: 0.75rem; }
+  .agent-prose strong { color: white; font-weight: 700; }
+  .agent-prose em { color: rgb(167 243 208); font-style: italic; }
+  .agent-prose ul { list-style-type: disc; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+  .agent-prose ol { list-style-type: decimal; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+  .agent-prose li { margin-bottom: 0.25rem; }
+  .agent-prose code { background: rgb(15 23 42); color: rgb(52 211 153); padding: 0.1rem 0.35rem; border-radius: 0.25rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+  .agent-prose h1, .agent-prose h2, .agent-prose h3 { color: white; font-weight: 700; margin: 1rem 0 0.5rem; }
 </style>
