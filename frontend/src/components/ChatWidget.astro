@@ -24,15 +24,15 @@ const placeholderText = lang === 'de' ? 'Frage eingeben...' : 'Ask a question...
         <span class="relative flex h-3 w-3">
           <span
             id="status-ping"
-            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"
+            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
           ></span>
-          <span id="status-dot" class="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"
+          <span id="status-dot" class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"
           ></span>
         </span>
         <span
           id="status-text"
-          class="text-[10px] font-bold tracking-widest text-yellow-400 uppercase"
-          >SYSTEM STARTING...</span
+          class="text-[10px] font-bold tracking-widest text-emerald-400 uppercase"
+          >SYSTEM ONLINE</span
         >
       </div>
       <div class="text-[10px] text-slate-500 font-mono">GEMINI-1.5-FLASH</div>
@@ -95,7 +95,6 @@ const placeholderText = lang === 'de' ? 'Frage eingeben...' : 'Ask a question...
   const chatWrapper = document.getElementById('chat-wrapper'); // Wrapper holen
 
   const API_URL = '/api/chat';
-  const HEALTH_URL = '/health';
 
   function setStatus(state) {
     if (!statusText || !statusDot || !statusPing) return;
@@ -157,70 +156,67 @@ const placeholderText = lang === 'de' ? 'Frage eingeben...' : 'Ask a question...
     chatContainer.scrollTop = chatContainer.scrollHeight;
   }
 
-  async function sendMessage() {
-    // @ts-ignore
-    if (!input || !input.value.trim()) return;
-    // @ts-ignore
-    const msg = input.value;
-    // @ts-ignore
-    input.value = '';
+  async function sendMessage(msgText: string, retryCount = 0) {
+    if (!input || !btn) return;
+    (input as HTMLInputElement).disabled = true;
+    (btn as HTMLButtonElement).disabled = true;
+    setStatus('processing');
 
     const currentLang = chatWrapper?.getAttribute('data-lang') || 'de';
-    appendMessage(msg, 'user');
-    setStatus('processing');
 
     try {
       const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: msg, language: currentLang })
+        body: JSON.stringify({ message: msgText, language: currentLang })
       });
+
+      if (res.status === 503 && retryCount < 2) {
+        appendMessage(
+          currentLang === 'de'
+            ? 'KI-System startet (Cold Start). Automatischer Neuversuch in 30 Sek...'
+            : 'AI system starting (cold start). Auto-retry in 30s...',
+          'ai'
+        );
+        setStatus('starting');
+        await new Promise((r) => setTimeout(r, 30_000));
+        await sendMessage(msgText, retryCount + 1);
+        return;
+      }
+
       if (!res.ok) throw new Error(`Status ${res.status}`);
       const data = await res.json();
       appendMessage(data.reply || 'Keine Antwort erhalten.', 'ai');
       setStatus('online');
     } catch {
-      appendMessage('Backend nicht erreichbar. Bitte in 30 Sek. erneut versuchen.', 'ai');
+      appendMessage(
+        currentLang === 'de'
+          ? 'Backend nicht erreichbar. Bitte Seite neu laden.'
+          : 'Backend unreachable. Please reload the page.',
+        'ai'
+      );
       setStatus('error');
+    } finally {
+      (input as HTMLInputElement).disabled = false;
+      (btn as HTMLButtonElement).disabled = false;
+      (input as HTMLInputElement).focus();
     }
   }
 
-  async function warmupBackend() {
-    if (input) (input as HTMLInputElement).disabled = true;
-    if (btn) (btn as HTMLButtonElement).disabled = true;
-    setStatus('starting');
-
-    const maxWait = 120_000;
-    const interval = 3_000;
-    const start = Date.now();
-
-    while (Date.now() - start < maxWait) {
-      try {
-        const res = await fetch(HEALTH_URL);
-        if (res.ok) {
-          if (input) (input as HTMLInputElement).disabled = false;
-          if (btn) (btn as HTMLButtonElement).disabled = false;
-          setStatus('online');
-          return;
-        }
-      } catch {
-        // CORS error or network error = backend not ready yet
-      }
-      await new Promise((r) => setTimeout(r, interval));
-    }
-
-    appendMessage('Backend konnte nicht erreicht werden. Bitte Seite neu laden.', 'ai');
-    setStatus('error');
+  function handleSend() {
+    // @ts-ignore
+    const msg = (input as HTMLInputElement).value.trim();
+    if (!msg) return;
+    (input as HTMLInputElement).value = '';
+    appendMessage(msg, 'user');
+    sendMessage(msg);
   }
 
-  if (btn) btn.addEventListener('click', sendMessage);
+  if (btn) btn.addEventListener('click', handleSend);
   if (input)
     input.addEventListener('keypress', (e) => {
-      // @ts-ignore
-      if (e.key === 'Enter') sendMessage();
+      if ((e as KeyboardEvent).key === 'Enter') handleSend();
     });
-
-  warmupBackend();
 </script>
 
 <style is:global>
