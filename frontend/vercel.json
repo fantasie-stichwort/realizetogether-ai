@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/health",
+      "destination": "https://realizetogether-ai.onrender.com/health"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://realizetogether-ai.onrender.com/api/:path*"
+    }
+  ]
+}

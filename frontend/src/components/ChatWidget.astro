@@ -94,11 +94,8 @@ const placeholderText = lang === 'de' ? 'Frage eingeben...' : 'Ask a question...
   const statusPing = document.getElementById('status-ping');
   const chatWrapper = document.getElementById('chat-wrapper'); // Wrapper holen
 
-  // --- CONFIG: Deine Cloud URL ---
-  const BASE_URL = import.meta.env.PUBLIC_API_URL;
-  const API_URL = `${BASE_URL}/api/chat`;
-
-  console.log('Verbinde zu Backend:', API_URL);
+  const API_URL = '/api/chat';
+  const HEALTH_URL = '/health';
 
   function setStatus(state) {
     if (!statusText || !statusDot || !statusPing) return;
@@ -193,16 +190,13 @@ const placeholderText = lang === 'de' ? 'Frage eingeben...' : 'Ask a question...
     if (btn) (btn as HTMLButtonElement).disabled = true;
     setStatus('starting');
 
-    // Fire-and-forget no-cors ping to trigger Render cold-start
-    fetch(`${BASE_URL}/health`, { mode: 'no-cors' }).catch(() => {});
-
     const maxWait = 120_000;
     const interval = 3_000;
     const start = Date.now();
 
     while (Date.now() - start < maxWait) {
       try {
-        const res = await fetch(`${BASE_URL}/health`);
+        const res = await fetch(HEALTH_URL);
         if (res.ok) {
           if (input) (input as HTMLInputElement).disabled = false;
           if (btn) (btn as HTMLButtonElement).disabled = false;
