@@ -1,6 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, Request, Form
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field 
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
 from typing import Literal, Optional
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
@@ -11,13 +12,20 @@ from langchain_core.messages import HumanMessage
 from dotenv import load_dotenv
 import os
 import base64
+import traceback
+import logging
 from datetime import datetime
 from langchain_core.tools import tool
+import sentry_sdk
 
 # ==========================================
 # 1. SETUP
 # ==========================================
 load_dotenv()
+sentry_sdk.init(
+    dsn=os.getenv("SENTRY_DSN"),
+    traces_sample_rate=1.0,
+)
 app = FastAPI()
 
 # DEBUG: Origin Logging
@@ -45,10 +53,18 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_origin_regex=origin_regex,
-    allow_credentials=True,    
-    allow_methods=["*"],       
-    allow_headers=["*"],       
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logging.error("Unhandled exception:\n" + traceback.format_exc())
+    return JSONResponse(
+        status_code=500,
+        content={"success": False, "error": f"Internal Server Error: {str(exc)}"},
+    )
 
 # ==========================================
 # 2. DATA (CV)
@@ -375,7 +391,7 @@ async def agent_endpoint(request: ChatRequest):
 @app.get("/")
 @app.get("/health")
 async def health_check():
-    return {"status": "ok"}
+    return {"status": "ok", "service": "realizetogether-ai"}
 
 if __name__ == "__main__":
     import uvicorn
