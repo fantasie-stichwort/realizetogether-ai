@@ -17,7 +17,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install dependencies
-        run: pip install -r backend/requirements.txt pytest pytest-asyncio httpx
+        run: pip install -r backend/requirements.txt pytest pytest-asyncio pytest-timeout httpx
       - name: Check app imports
         run: python -c "import sys; sys.path.insert(0, 'backend'); import main"
         env:
