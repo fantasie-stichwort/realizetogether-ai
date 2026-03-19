@@ -100,16 +100,6 @@ const placeholderText = lang === 'de' ? 'Frage eingeben...' : 'Ask a question...
 
   console.log('Verbinde zu Backend:', API_URL);
 
-  // Backend aufwecken (Render Free Tier schläft nach Inaktivität ein)
-  async function wakeUpBackend() {
-    try {
-      await fetch(`${BASE_URL}/health`, { method: 'GET' });
-    } catch {
-      // Noch schlafend – kein Fehler zeigen
-    }
-  }
-  wakeUpBackend();
-
   function setStatus(state) {
     if (!statusText || !statusDot || !statusPing) return;
     if (state === 'processing') {
@@ -119,6 +109,13 @@ const placeholderText = lang === 'de' ? 'Frage eingeben...' : 'Ask a question...
       statusPing.classList.remove('hidden');
       statusPing.className =
         'animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75';
+    } else if (state === 'warming') {
+      statusText.innerText = 'WARMING UP...';
+      statusText.className = 'text-[10px] font-bold tracking-widest text-orange-400 uppercase';
+      statusDot.className = 'relative inline-flex rounded-full h-3 w-3 bg-orange-500';
+      statusPing.classList.remove('hidden');
+      statusPing.className =
+        'animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75';
     } else if (state === 'error') {
       statusText.innerText = 'CONNECTION ERROR';
       statusText.className = 'text-[10px] font-bold tracking-widest text-red-400 uppercase';
@@ -163,8 +160,10 @@ const placeholderText = lang === 'de' ? 'Frage eingeben...' : 'Ask a question...
     chatContainer.scrollTop = chatContainer.scrollHeight;
   }
 
-  async function fetchWithRetry(msg, lang, maxRetries = 3) {
-    let lastError = new Error('Keine Verbindung möglich.');
+  // Render Free Tier Cold Start: bis zu 60s warten (6 × 10s)
+  async function fetchWithRetry(msg, lang, maxRetries = 6) {
+    let lastError = new Error('Backend nicht erreichbar. Bitte Seite neu laden.');
+    let warmingMsgShown = false;
     for (let i = 0; i < maxRetries; i++) {
       try {
         const res = await fetch(API_URL, {
@@ -173,13 +172,21 @@ const placeholderText = lang === 'de' ? 'Frage eingeben...' : 'Ask a question...
           body: JSON.stringify({ message: msg, language: lang })
         });
         if (res.ok || res.status === 429 || i === maxRetries - 1) return res;
-        appendMessage(`⏳ Backend startet... (Versuch ${i + 2}/${maxRetries})`, 'ai');
-        await new Promise(r => setTimeout(r, 5000));
+        setStatus('warming');
+        if (!warmingMsgShown) {
+          appendMessage('⏳ Backend startet... (Render Free Tier benötigt ~30–60 Sek. beim ersten Aufruf)', 'ai');
+          warmingMsgShown = true;
+        }
+        await new Promise(r => setTimeout(r, 10000));
       } catch (e) {
         lastError = e instanceof Error ? e : new Error(String(e));
         if (i < maxRetries - 1) {
-          appendMessage(`⏳ Verbindung wird aufgebaut... (Versuch ${i + 2}/${maxRetries})`, 'ai');
-          await new Promise(r => setTimeout(r, 5000));
+          setStatus('warming');
+          if (!warmingMsgShown) {
+            appendMessage('⏳ Backend startet... (Render Free Tier benötigt ~30–60 Sek. beim ersten Aufruf)', 'ai');
+            warmingMsgShown = true;
+          }
+          await new Promise(r => setTimeout(r, 10000));
         }
       }
     }
