@@ -1,77 +1,100 @@
-# SINAN UÇAR
-**Senior Full Stack Engineer | Diplom-Informatiker (Univ.)**
-📍 Deutschland (Remote)
-🔗 LinkedIn Profil | 🐙 GitHub Profil
+SİNAN UÇAR
 
-## KURZPROFIL
-Leidenschaftlicher Senior Software Engineer mit 15+ Jahren Erfahrung in der Entwicklung skalierbarer Web-Architekturen. Spezialist für modernes Frontend-Engineering (React, Lit, Web Components) und die Etablierung unternehmensweiter Design-Systeme. Kombiniert ein tiefes akademisches Verständnis für KI (Diplomarbeit über Neuronale Netze) mit aktueller Praxis in Cloud-Native Umgebungen. Zielstrebig in der Optimierung von CI/CD-Pipelines und engagiert im Mentoring agiler Teams.
+Diplom-Informatiker | Senior AI Solutions Architect | Enterprise Architecture
+📍 Deutschland | ✉️ info@sinan.com
+🔗 LinkedIn: linkedin.com/in/infosinanucar | 🌐 Portfolio: sinanucar.com
 
-## KOMPETENZEN
+KURZPROFIL
 
-### Frontend Architecture
-* **Experte:** TypeScript, JavaScript (ES6+), HTML5, CSS3
-* **Frameworks:** React, Lit (Web Components), Vue.js
-* **Styling:** Tailwind CSS, Storybook, Design Systems
-* **Konzepte:** Micro-Frontends, Responsive Design
+Diplom-Informatiker mit über 15 Jahren Erfahrung in der Software- und Enterprise-Architektur. Spezialisiert auf den Brückenschlag zwischen klassischer, deterministischer Softwareentwicklung und produktionsreifer generativer KI. Expertise im Aufbau von MLOps-Pipelines, skalierbaren RAG-Systemen und asynchronen Backend-Architekturen. Lösungsstarker Architekt, der komplexe Teams steuert und KI-Modelle sicher und compliancekonform in Produktion bringt.
 
-### Backend & Cloud
-* **Languages:** Node.js, C# (.NET)
-* **Data:** SQL, MongoDB, NoSQL
-* **Infra:** Docker, Kubernetes, RESTful APIs
+TECHNOLOGISCHE KOMPETENZEN
 
-### DevOps & Quality
-* **Testing:** Playwright (E2E), Jest, Vitest
-* **Tools:** GitLab CI/CD, Vite, npm/yarn
-* **Methoden:** TDD, Clean Code, Code Reviews
+AI Engineering & MLOps: Python, FastAPI, LangChain, LangGraph, Pydantic, RAG-Architekturen, Agentic Workflows, LLM-Orchestrierung (OpenAI, Gemini), Prompt Engineering
 
-## BERUFSERFAHRUNG
+Backend & Systemarchitektur: Node.js, Express, C#, Java, SQL, NoSQL (MongoDB), REST-APIs, Micro-Frontends, Client-Server-Architektur
 
-**Senior Frontend Engineer (Remote)**
-*Ceyoniq GmbH, Bielefeld | 10/2022 – Heute*
-Modernisierung der Frontend-Landschaft für Enterprise-DMS-Lösungen.
-* **Design-System Architektur:** Konzeption und Lead-Entwicklung einer firmenweiten Komponentenbibliothek basierend auf Lit (Web Components) und Storybook. Dies ermöglichte konsistente UIs über 20+ Entwicklerteams hinweg.
-* **Qualitätsoffensive:** Steigerung der automatisierten Testabdeckung auf >90% durch die Einführung einer End-to-End-Teststrategie mit Playwright in der GitLab CI/CD Pipeline.
-* **Micro-Frontends:** Orchestrierung skalierbarer Micro-Frontend-Architekturen unter Einsatz von TypeScript, Vue und React zur Entkopplung monolithischer Systeme.
-* **Mentoring:** Aktives Coaching von Junior-Entwicklern und Etablierung strenger Code-Review-Prozesse zur Sicherung der Code-Qualität.
+DevOps, CI/CD & Testing: GitLab CI/CD, Docker, Kubernetes, Git, Playwright (E2E-Testing), Automatisierung, Jest
 
-**Senior Web Developer & Consultant (Freelance)**
-*Fil & Muz, Duisburg | 12/2020 – 09/2022*
-Eigenverantwortliche Umsetzung von Webprojekten für Agenturen und KMUs.
-* **Performance-Optimierung:** Reduktion der Ladezeiten (Core Web Vitals) um bis zu 40% durch gezieltes Refactoring und Asset-Optimierung.
-* **Full-Cycle Development:** Eigenständige Leitung von SPA-Projekten (Single Page Applications) von der Anforderungsanalyse bis zum Deployment.
-* **Beratung:** Strategische Beratung zu UX-Optimierung und Barrierefreiheit.
+Frontend Engineering: TypeScript, Astro (Islands Architecture), Web Components (Lit), Vue.js, React, Tailwind CSS
 
-**Frontend Entwickler**
-*Smoox GmbH, Düsseldorf | 05/2019 – 11/2020*
-Entwicklung interaktiver Rich-Media-Lösungen.
-* **Effizienzsteigerung:** Verkürzung der Release-Zyklen von Tagen auf Stunden durch die Implementierung automatisierter Build-Pipelines (GitLab-CI).
-* **Modularisierung:** Aufbau einer wiederverwendbaren Modulbibliothek mit ES6+, die die Erstellung von Marketing-Kampagnen beschleunigte.
+BERUFSERFAHRUNG
 
-**IT Consultant & Project Lead**
-*ÇIĞIŞ Software Systems Ltd., Istanbul | 10/2014 – 12/2018*
-* **Agile Transformation:** Erfolgreiche Einführung von Scrum/Kanban, was zu transparenteren Prozessen und höherer Liefertreue führte.
-* **Full Stack:** Entwurf mehrschichtiger Enterprise-Architekturen (Java, C#, SQL).
+Founder & Principal AI Engineer (R&D)
+realizetogether | Remote | 01/2024 – Heute
+Aufbau und Betrieb eines unabhängigen R&D-Labors zur Entwicklung produktionsreifer KI-Architekturen im Enterprise-Kontext.
 
-**Software-Entwickler**
-*Invitec GmbH, Duisburg | 06/2009 – 08/2014*
-* **Performance:** Reduktion der Berichtsgenerierungszeiten um 30% im Kernprodukt Instacount® durch C# Code-Refactoring und SQL-Optimierung.
-* **Integration:** Entwicklung robuster Schnittstellen für den Datenaustausch mit Fremdsystemen.
+AI-Backend & Orchestrierung: Entwicklung asynchroner Backend-Systeme (FastAPI) für latenzarme LLM-Aufrufe. Architektur von Agentic-Workflows und "Lean-RAG"-Systemen mit LangChain/LangGraph.
 
-## AUSBILDUNG
+Datenintegrität & Compliance: Sicherstellung deterministischer KI-Antworten durch Structured Outputs und automatisierte Self-Correction-Loops (Pydantic v2).
 
-**Diplom-Informatiker (Univ.)**
-*TU Dortmund | 2000 – 2008*
-* Abschluss: Mit Auszeichnung
-* Äquivalent zu Master of Science (M.Sc.) / EQF Level 7
-* **Fokus Diplomarbeit:** "Konnektionistische Systeme in neuronalen Netzen" (Fundierte mathematische Basis für moderne KI/LLM-Architekturen)
+Multimodale KI: Integration von Vision-APIs und Sentiment-Routing für kontextbezogene, dynamische Workflows.
 
-## SPRACHEN
-* **Deutsch:** Muttersprachliches Niveau (C2)
-* **Englisch:** Verhandlungssicher (C1)
-* **Türkisch:** Muttersprache
+Frontend-Architecture: Entwicklung latenzfreier, KI-gestützter UIs mittels Astro und Tailwind CSS.
 
-## SOFT SKILLS
-* Mentoring & Coaching
-* Agiles Mindset (Scrum)
-* Architektur-Design
-* Problemlösungskompetenz
+Senior Software Engineer (Frontend Architecture)
+Ceyoniq GmbH, Bielefeld | 10/2022 – Heute
+Architektonische Verantwortung für skalierbare Enterprise-Plattformen. Fokus auf System-Design, Performance-Optimierung und Engineering-Standards in verteilten Umgebungen.
+
+Systemarchitektur: Konzeption und Entwicklung modularer Enterprise-Architekturen mit TypeScript, Vue und Web Components (Lit).
+
+Skalierung & Governance: Architektur und technische Leitung einer zentralen UI-Komponentenbibliothek (Storybook) für über 20 Entwicklerteams.
+
+Client-Server-Kommunikation: API-Design und Anbindung von REST-Schnittstellen (Node.js/Express) mit starkem Fokus auf asynchrone Datenfluss-Optimierung.
+
+Deterministische Qualitätssicherung: Aufbau geschäftskritischer CI/CD-Pipelines (GitLab) und Implementierung ausfallsicherer End-to-End-Testarchitekturen (Playwright, > 90 % Abdeckung).
+
+Technical Leadership & Agile: Teilprojektleitung, Architektur-Reviews, Mentoring (Scrum) und Performance/Security-Audits (CSP, XSS-Prevention).
+
+Senior Software Engineer / Technical Consultant (Freelance)
+Fil & Muz, Remote | 12/2020 – 09/2022
+Verantwortlich für Architekturdesign und End-to-End-Entwicklung hochperformanter Web-Applikationen.
+
+Systemarchitektur: Eigenständige technische Projektleitung von der Anforderungsanalyse bis zum produktiven Deployment.
+
+Performance Engineering: Tiefgreifende Optimierung der Rendering-Pfade und Asset-Delivery, Reduzierung der Ladezeiten um bis zu 40 %.
+
+Consulting: Strategische Beratung internationaler Agenturen und KMUs hinsichtlich skalierbarer, nachhaltiger Architekturen.
+
+Software Engineer (Frontend & Process Automation)
+Smoox GmbH, Düsseldorf | 05/2019 – 11/2020
+Technische Transformation veralteter Entwicklungsabläufe und Architekturverantwortung für performante digitale Kampagnen.
+
+Prozess-Transformation: Eigenverantwortliche Modernisierung durch Etablierung agiler Workflows (Kanban) und drastische Erhöhung der Liefergeschwindigkeit.
+
+Systemarchitektur: Aufbau einer streng wiederverwendbaren Modularchitektur für flexible Layout-Varianten mit TypeScript/JavaScript (ES6+).
+
+DevOps & Automatisierung: Architektur und Implementierung automatisierter Build- und Deployment-Pipelines (GitLab-CI). Verkürzung der Release-Zyklen von Tagen auf Stunden.
+
+Senior IT Consultant & Enterprise Architect
+ÇIĞIŞ Software Systems Ltd., Istanbul | 10/2014 – 12/2018
+Technische Leitung komplexer Enterprise-Projekte und Steuerung internationaler Teams.
+
+Enterprise-Systemdesign: Entwurf und Implementierung mehrschichtiger, verteilter Architekturen (Backend/Frontend) mit Java, C# und SQL.
+
+Technical Leadership: Steuerung internationaler Offshore-Teams (bis zu 12 Personen) und Einführung agiler Entwicklungsprozesse (Scrum, Kanban).
+
+Projektmanagement: Koordination kritischer internationaler Rollouts, Risikomanagement und Requirements-Engineering mit Stakeholdern.
+
+Backend Software Engineer (C# / .NET)
+Invitec GmbH & Co. KG, Duisburg | 06/2009 – 08/2014
+Weiterentwicklung und Portierung geschäftskritischer Kernsysteme.
+
+Data & Performance Engineering: Code-Refactoring und Optimierung komplexer SQL-Datenbankabfragen (Stored Procedures), Reduzierung der Berichtszeiten um 30%.
+
+API-Design: Entwicklung robuster, datei- und webbasierter Schnittstellen für den automatisierten Datenaustausch mit Fremdsystemen.
+
+Software Quality: Etablierung von Testautomatisierung, technischer Dokumentation und Fehleranalyse im gesamten SDLC.
+
+STUDIUM
+
+Diplom-Informatik | Gesamtnote: mit Auszeichnung
+Technische Universität Dortmund | 2000–2008
+
+Diplomarbeit: "Konnektionistische Systeme in natürlichen und künstlichen neuronalen Netzen sowie in den kognitiven Neurowissenschaften – Strukturen, Lernen und Fähigkeiten."
+
+SPRACHEN & SOFT SKILLS
+
+Sprachen: Deutsch, Englisch (B2/C1), Türkisch
+
+Soft Skills: Analytisches Systemdenken, Mentoring & Teamführung, hohes Verantwortungsbewusstsein bei Architektur-Entscheidungen, exzellente Problemlösungsfähigkeiten.
