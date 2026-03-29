@@ -8,7 +8,6 @@ const lang = Astro.currentLocale || 'de';
 const routes = {
   home: { de: '/', en: '/' },
   about: { de: 'profil', en: 'profile' },
-  projects: { de: 'projekte', en: 'projects' },
   cv: { de: 'lebenslauf', en: 'resume' },
   blog: { de: 'blog', en: 'blog' },
   ai: { de: 'ai', en: 'ai' },
@@ -18,7 +17,6 @@ const routes = {
 const t = {
   home: 'Home',
   about: lang === 'de' ? 'Profil' : 'Profile',
-  projects: lang === 'de' ? 'Projekte' : 'Projects',
   cv: lang === 'de' ? 'Lebenslauf' : 'Resume',
   blog: 'Blog',
   showcase: 'AI Showcase',
@@ -28,7 +26,6 @@ const t = {
 const links = [
   { name: t.home, href: getRelativeLocaleUrl(lang, routes.home[lang]) },
   { name: t.about, href: getRelativeLocaleUrl(lang, routes.about[lang]) },
-  { name: t.projects, href: getRelativeLocaleUrl(lang, routes.projects[lang]) },
   { name: t.cv, href: getRelativeLocaleUrl(lang, routes.cv[lang]) },
   { name: t.blog, href: getRelativeLocaleUrl(lang, routes.blog[lang]) },
   { name: t.showcase, href: getRelativeLocaleUrl(lang, routes.ai[lang]) },
