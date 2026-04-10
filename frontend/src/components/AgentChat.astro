@@ -5,20 +5,20 @@ const API_URL = import.meta.env.PUBLIC_API_URL;
 const t = {
   de: {
     title: "Portfolio Agent",
-    desc: "Ein autonomer KI-Agent mit Tools. Er kann rechnen, die Zeit lesen und Projekte durchsuchen.",
-    placeholder: "Frage den Agenten (z.B. 'Wie spät ist es?' oder 'Berechne 42*1337')",
+    desc: "Ein autonomer KI-Agent. Frag nach Skills, Projekten oder Verfügbarkeit.",
+    placeholder: "z.B. 'Welche KI-Projekte hat Sinan?' oder 'Wann ist er verfügbar?'",
     btn: "Fragen",
     thinking: "Überlege...",
-    agent_label: "Smarter Agent",
+    agent_label: "Portfolio Agent",
     results: "Agenten-Antwort:"
   },
   en: {
     title: "Portfolio Agent",
-    desc: "An autonomous AI agent with tools. He can calculate, tell the time, and search projects.",
-    placeholder: "Ask the agent (e.g., 'What time is it?' or 'Calculate 42*1337')",
+    desc: "An autonomous AI agent. Ask about skills, projects, or availability.",
+    placeholder: "e.g. 'What AI projects has Sinan built?' or 'When is he available?'",
     btn: "Ask",
     thinking: "Thinking...",
-    agent_label: "Smart Agent",
+    agent_label: "Portfolio Agent",
     results: "Agent Output:"
   }
 };
@@ -81,7 +81,7 @@ const text = lang === 'en' ? t.en : t.de;
 
     <div class="mt-auto pt-6 border-t border-slate-700/50 text-[10px] text-slate-500 uppercase tracking-widest flex items-center gap-2">
       <span class="text-green-500/50">●</span>
-      <strong class="text-slate-400 font-semibold">Tech Level 6:</strong> ASynchronous Tool-Calling, Gemini Flash, LangChain, FastAPI
+      <strong class="text-slate-400 font-semibold">Tech:</strong> Async Tool-Calling · Multi-Provider Fallback (Groq → Gemini → OpenAI) · LangChain · FastAPI
     </div>
   </div>
 </div>

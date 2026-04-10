@@ -16,3 +16,5 @@ __pycache__/
 .env*.local
 bundle_code.py
 codebase.txt
+
+.agents/

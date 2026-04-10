@@ -11,10 +11,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage
 from dotenv import load_dotenv
 import os
-import ast
-import operator
 import base64
-import traceback
 import logging
 import httpx
 import re
@@ -98,15 +95,6 @@ def load_cv():
         print(f"❌ Error loading CV: {e}")
         CV_CONTEXT = "Error loading CV."
 load_cv()
-
-# ==========================================
-# 2.1 PROJECTS DATA (Mock)
-# ==========================================
-PROJECTS = [
-    {"name": "Sinan Ucar Portfolio", "tech": "Astro, FastAPI, Gemini", "desc": "KI-Portfolio mit Multi-Provider Fallback."},
-    {"name": "Lean RAG Bot", "tech": "Python, LangChain", "desc": "Effizienter Bot mit In-Context Learning."},
-    {"name": "UX Analyzer", "tech": "Vision LLM, Tailwind", "desc": "Analysiert Screenshots auf Design-Qualität."},
-]
 
 # ==========================================
 # 3. AI MODELS (Resilient Fallback System)
@@ -196,50 +184,181 @@ async def invoke_resiliently(prompt_or_messages, input_data=None, is_vision=Fals
 # 3.1 AGENT TOOLS
 # ==========================================
 @tool
-def get_current_time():
-    """Returns the current server time. Useful for greetings or context-aware replies."""
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+def get_cv_summary() -> dict:
+    """Returns a structured summary of Sinan Ucar's core competencies, skills, education,
+    and professional background. Use this when asked about skills, experience, tech stack,
+    or professional background."""
+    return {
+        "name": "Sinan Ucar",
+        "title": "Senior AI Solutions Architect | Diplom-Informatiker",
+        "education": {
+            "degree": "Diplom-Informatik (equiv. M.Sc. Computer Science) — mit Auszeichnung",
+            "university": "Technische Universität Dortmund (2000–2008)",
+            "thesis": "Connectionist Systems in Natural & Artificial Intelligence and Cognitive Neuroscience",
+        },
+        "experience_years": "15+ years software engineering, AI focus since 2024",
+        "current_role": "Senior Software Engineer @ Ceyoniq Technology GmbH (since 10/2022) + independent AI R&D",
+        "ai_skills": [
+            "LangChain (langchain-core, -google-genai, -openai, -groq, -anthropic)",
+            "Multi-Provider LLM Fallback Architecture",
+            "Structured Output via Pydantic (with_structured_output)",
+            "RAG — Retrieval-Augmented Generation (ChromaDB, Vector Embeddings)",
+            "Agentic Workflows (Tool-Calling, ReAct pattern, LangGraph)",
+            "LLM providers: Gemini, GPT-4o, Groq (LPU), Claude",
+            "Multimodal Vision APIs",
+            "Sentiment Analysis & NLP pipelines",
+        ],
+        "backend_skills": [
+            "FastAPI + Python 3.12 (async/await)",
+            "Node.js / Express",
+            "C# / .NET",
+            "REST API Design & Data Governance",
+            "Sentry Monitoring, Docker, GitLab CI/CD",
+            "Playwright E2E Testing (>90% coverage)",
+        ],
+        "frontend_skills": [
+            "Astro.js (Islands Architecture)",
+            "Next.js 16 (App Router, Server Components)",
+            "TypeScript",
+            "Tailwind CSS",
+            "Vue.js, Web Components (Lit)",
+        ],
+        "architecture_focus": (
+            "Deterministic, production-grade AI integrations — "
+            "bridging classical enterprise systems with LLM backends. "
+            "Key concerns: hallucination reduction via structured output, "
+            "latency optimization via Groq LPU, resilient fallback chains."
+        ),
+        "languages": ["German (native)", "English (professional)", "Turkish (native)"],
+    }
 
-_CALC_OPS = {
-    ast.Add: operator.add,
-    ast.Sub: operator.sub,
-    ast.Mult: operator.mul,
-    ast.Div: operator.truediv,
-    ast.Pow: operator.pow,
-    ast.USub: operator.neg,
-    ast.UAdd: operator.pos,
-}
-
-def _safe_eval_node(node: ast.expr):
-    """Recursively evaluate a whitelisted AST node."""
-    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
-        return node.value
-    if isinstance(node, ast.BinOp) and type(node.op) in _CALC_OPS:
-        return _CALC_OPS[type(node.op)](_safe_eval_node(node.left), _safe_eval_node(node.right))
-    if isinstance(node, ast.UnaryOp) and type(node.op) in _CALC_OPS:
-        return _CALC_OPS[type(node.op)](_safe_eval_node(node.operand))
-    raise ValueError(f"Unsupported operation: {type(node).__name__}")
 
 @tool
-def calculator(expression: str):
-    """Solves mathematical expressions. Input should be a simple math string like '123 * 45'."""
-    try:
-        tree = ast.parse(expression.strip(), mode="eval")
-        result = _safe_eval_node(tree.body)
-        return str(result)
-    except (ValueError, ZeroDivisionError, SyntaxError) as e:
-        return f"Fehler bei der Berechnung: {str(e)}"
-    except Exception:
-        return "Fehler: Ungültiger Ausdruck."
+def get_project_details(project_name: str) -> dict:
+    """Returns technical details about one of Sinan's portfolio projects.
+    Use this when asked about a specific project.
+    Available projects: 'Realize Together', 'Logopädie Report Agent', 'Portfolio Backend'."""
+    projects = {
+        "realize together": {
+            "name": "RealizeTogether",
+            "description": "AI-powered collaboration platform for goal setting and accountability between users.",
+            "stack": ["Next.js 16 (App Router)", "Supabase (PostgreSQL + Auth + Realtime)", "FastAPI", "TypeScript"],
+            "ai_technologies": [
+                "LangChain multi-provider LLM orchestration",
+                "Structured Output with Pydantic",
+                "Multi-Provider Fallback (Groq → Gemini → OpenAI)",
+            ],
+            "architecture": (
+                "Fullstack: Next.js frontend with Server Components by default for performance. "
+                "FastAPI as dedicated AI microservice (separation of concerns). "
+                "Supabase handles auth, real-time subscriptions, and PostgreSQL persistence."
+            ),
+            "key_decisions": [
+                "Server Components by default — client boundary only where strictly necessary",
+                "FastAPI as AI microservice — keeps AI complexity isolated from Next.js layer",
+                "Supabase for zero-config auth and realtime — avoids building custom WebSocket infra",
+                "Groq LPU as primary LLM — 10–20× faster inference than OpenAI at lower cost",
+            ],
+            "status": "Active development",
+        },
+        "logopädie report agent": {
+            "name": "Logopädie Report Agent",
+            "description": (
+                "AI agent that automates professional therapy report generation for speech therapists. "
+                "Includes audio transcription (session recordings → structured reports)."
+            ),
+            "stack": ["Next.js 16", "FastAPI", "Groq (Whisper API)", "LangChain", "Python 3.12"],
+            "ai_technologies": [
+                "Groq Whisper for ultra-fast audio transcription",
+                "LLM-driven structured report generation",
+                "Pydantic structured output for consistent report format",
+            ],
+            "architecture": (
+                "Next.js frontend → FastAPI backend pipeline: "
+                "audio upload → Whisper transcription → LLM report generation → structured JSON output. "
+                "Async pipeline handles files up to 4MB."
+            ),
+            "key_decisions": [
+                "Groq chosen for transcription — LPU advantage: near-instant turnaround vs. OpenAI Whisper",
+                "Pydantic structured output — ensures reports are always parseable, never free-form hallucinations",
+                "FastAPI async — handles concurrent therapist sessions without blocking",
+                "Portfolio-grade production patterns applied to a real domain problem",
+            ],
+            "status": "Portfolio project — live demo available",
+        },
+        "portfolio backend": {
+            "name": "Sinan Ucar Portfolio Backend",
+            "description": "Production FastAPI backend powering sinanucar.com with 4 AI endpoints showcasing different LLM integration patterns.",
+            "stack": ["FastAPI", "Python 3.12", "LangChain", "Astro.js (frontend)", "Render (deployment)", "Sentry"],
+            "ai_technologies": [
+                "Multi-Provider Fallback: Groq → Gemini → OpenAI (invoke_resiliently)",
+                "Tool-Calling Agent (manual async loop — no LangGraph overhead)",
+                "Structured Output via Pydantic for all endpoints",
+                "Multimodal Vision Analysis (Gemini Flash)",
+                "Sentiment Analysis with typed emotion output",
+            ],
+            "architecture": (
+                "4 endpoints: /api/chat (CV assistant with context injection), "
+                "/api/vision (UX screenshot analyzer, multimodal), "
+                "/api/analyze (sentiment with structured Pydantic output), "
+                "/api/agent (tool-calling agent with async manual loop). "
+                "invoke_resiliently() tries providers in sequence on quota/timeout failure. "
+                "Separate fallback chains: text (Groq-first) vs. vision (Gemini-first, no Groq multimodal)."
+            ),
+            "key_decisions": [
+                "Groq as primary LLM — LPU: 10–20× faster than OpenAI, ideal for latency-sensitive portfolio demos",
+                "Manual agent loop instead of LangGraph — simpler, zero graph overhead for current tool count",
+                "Separate vision fallback chain — Groq has no multimodal support, Gemini Flash is primary",
+                "Sentry integration — production-grade observability even for a portfolio project",
+                "CORS allowlist (no wildcard) — security by default",
+            ],
+            "status": "Live at sinanucar.com",
+        },
+    }
+
+    def _normalize(s: str) -> str:
+        return s.lower().strip().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").replace("ß", "ss")
+
+    key = _normalize(project_name)
+    for project_key, project_data in projects.items():
+        norm_key = _normalize(project_key)
+        if norm_key in key or key in norm_key or any(word in key for word in norm_key.split()):
+            return project_data
+
+    return {
+        "error": f"Project '{project_name}' not found.",
+        "available_projects": list(projects.keys()),
+    }
+
 
 @tool
-def search_projects(query: str):
-    """Searches through Sinan's projects. Input should be a keyword like 'KI' or 'Frontend'."""
-    query = query.lower()
-    results = [p for p in PROJECTS if query in p['name'].lower() or query in p['tech'].lower() or query in p['desc'].lower()]
-    if not results:
-        return "Keine passenden Projekte gefunden."
-    return str(results)
+def get_availability() -> dict:
+    """Returns Sinan Ucar's current availability, preferred roles, work model preferences,
+    and how to get in touch. Use this when asked about hiring, availability, job search,
+    or work preferences."""
+    return {
+        "availability": "Available with 3-month notice period (Kündigungsfrist)",
+        "notice_period_months": 3,
+        "open_to_roles": [
+            "AI Engineer",
+            "Senior AI Solutions Architect",
+            "Backend Engineer with AI/LLM focus",
+            "Technical Lead (AI-first teams)",
+        ],
+        "not_interested_in": "Pure frontend-only or non-AI/non-backend roles",
+        "work_model": "Remote preferred — hybrid possible for right opportunity",
+        "location": "Germany",
+        "preferred_tech_stack": ["Python", "FastAPI", "LangChain / LangGraph", "Next.js", "TypeScript"],
+        "domain_interests": [
+            "Enterprise AI integration",
+            "Agentic systems & RAG pipelines",
+            "LLM governance & deterministic AI",
+            "Developer tooling with AI",
+        ],
+        "contact": "sinanucar.com/kontakt or info@sinanucar.com",
+        "linkedin": "linkedin.com/in/infosinanucar",
+    }
+
 
 @tool
 async def web_search(query: str) -> str:
@@ -275,7 +394,7 @@ async def fetch_webpage(url: str) -> str:
     except Exception as e:
         return f"Fehler beim Abrufen der Seite: {str(e)}"
 
-tools = [get_current_time, calculator, search_projects, web_search, fetch_webpage]
+tools = [get_cv_summary, get_project_details, get_availability, web_search, fetch_webpage]
 
 # ==========================================
 # 4. DATA MODELS
@@ -414,8 +533,16 @@ async def agent_endpoint(request: ChatRequest):
     try:
         start_time = datetime.now()
         
-        cv_str = str(CV_CONTEXT)
-        system_content = f"Du bist Sinans smarter Portfolio-Assistent. Nutze Tools wenn nötig. Antworte in der Sprache: {request.language}. CV Kontext: {cv_str[:500]}"
+        system_content = (
+            f"Du bist Sinans professioneller Portfolio-Assistent. "
+            f"Antworte in der Sprache: {request.language}. "
+            "Nutze folgende Tools aktiv bei Recruiting-Fragen: "
+            "- get_cv_summary() → bei Fragen zu Skills, Erfahrung, Tech-Stack, Ausbildung "
+            "- get_project_details(project_name) → bei Fragen zu konkreten Projekten (Realize Together, Logopädie Report Agent, Portfolio Backend) "
+            "- get_availability() → bei Fragen zu Verfügbarkeit, Wechselbereitschaft, bevorzugten Rollen "
+            "- web_search(query) → für aktuelle externe Informationen "
+            "Antworte präzise und professionell. Zeige technische Tiefe."
+        )
         messages: list = [
             {"role": "system", "content": system_content},
             {"role": "user", "content": request.message}
