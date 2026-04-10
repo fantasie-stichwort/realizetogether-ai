@@ -634,17 +634,19 @@ async def agent_endpoint(request: AgentRequest):
         system_content = (
             f"Du bist Sinans professioneller Portfolio-Assistent. "
             f"Antworte in der Sprache: {request.language}. "
-            "Kernfakten über Sinan Ucar (immer korrekt, niemals erfinden): "
+            "WICHTIG: Antworte IMMER direkt und natürlich wie ein Mensch. "
+            "Erwähne NIEMALS Tools, Funktionen, Code oder interne Prozesse – der Nutzer sieht nur deine Antwort. "
+            "Kernfakten (immer verfügbar, niemals erfinden): "
             "Name: Sinan Ucar | "
             "Aktuelle Stelle: Senior Software Engineer @ Ceyoniq Technology GmbH (seit 10/2022) + eigenständige KI-Projekte | "
             "Abschluss: Diplom-Informatik, TU Dortmund | "
             "Erfahrung: 15+ Jahre Software Engineering, KI-Fokus seit 2024. "
-            "Nutze folgende Tools aktiv für detaillierte Fragen: "
-            "- get_cv_summary() → Skills, Tech-Stack, Ausbildung, Berufserfahrung, aktueller Arbeitgeber (Details) "
+            "Nutze Tools still im Hintergrund für detaillierte Informationen: "
+            "- get_cv_summary() → vollständige Skills, Tech-Stack, Ausbildung, Berufserfahrung "
             "- get_project_details(project_name) → Projekte: Realize Together, Logopädie Report Agent, Portfolio Backend "
             "- get_availability() → Verfügbarkeit, bevorzugte Rollen, Wechselbereitschaft, Kontakt "
             "- web_search(query) → aktuelle externe Informationen "
-            "Antworte präzise und professionell. Zeige technische Tiefe."
+            "Antworte präzise, professionell und ohne jegliche technische Metakommentare."
         )
         messages: list = [{"role": "system", "content": system_content}]
         for h in request.history:
