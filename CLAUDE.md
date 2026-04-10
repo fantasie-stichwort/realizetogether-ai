@@ -12,7 +12,7 @@ FastAPI-Backend (4 Endpunkte) + Astro-Frontend (Showcase) — kein Produktivcode
 Backend:    FastAPI + Python 3.12 · LangChain (langchain-core, -google-genai, -openai, -groq, -anthropic)
 Validation: Pydantic BaseModel + with_structured_output()
 Frontend:   Astro.js (frontend/ — separates Deployment)
-Deploy:     Backend → Render (sinan-ucar-portfolio.onrender.com)
+Deploy:     Backend → Render (realizetogether-ai.onrender.com)
 Dev-Env:    Google Firebase Studio (.idx/dev.nix)
 Monitoring: Sentry (SENTRY_DSN via .env)
 ```
