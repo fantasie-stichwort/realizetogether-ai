@@ -1,14 +1,13 @@
 # TASKS.md — AI Task Board
 
-> Simple task board for AI agents and humans.
-> Keep this file updated. Move tasks as they progress.
-> One task = one checkbox. Be concrete enough that any agent can act on it.
+> One task = one checkbox. Keep In Progress to ≤2 items.
+> Update this file at the end of every session.
 
 ---
 
 ## In Progress
 
-- [ ] TODO: task currently being worked on — assigned to: Claude Code / Codex / Gemini / human
+_Nichts aktiv in Arbeit._
 
 ---
 
@@ -16,38 +15,37 @@
 
 Tasks ready to be picked up. Ordered by priority (top = highest).
 
-- [ ] TODO: next task
-- [ ] TODO: next task
+- [ ] `.DS_Store` zu `.gitignore` hinzufügen (liegt uncommitted im Repo)
+- [ ] Live-Portfolio-Review: alle Seiten öffnen und auf Content-Lücken oder UX-Probleme prüfen
+- [ ] Entscheiden: (a) fehlendes Projekt eintragen oder (b) AI-Chat-Feature verbessern — Entscheidung hier dokumentieren, dann umsetzen
+- [ ] AI-Chat verifizieren: FastAPI-Backend starten, CV-Verfügbarkeits-Check testen (nach Content-Änderungen)
 
 ---
 
 ## Done
 
-Completed tasks. Keep recent completions here; archive old ones below.
-
-- [x] TODO: completed task — completed: YYYY-MM-DD
+- [x] Narrative Überarbeitung: Projects, About, Hero, Nav — 2026-05
+- [x] i18n: `ueber-mich` ↔ `about` Route-Mapping in LanguagePicker — 2026
+- [x] Werdegang unter Toolbox verschoben — 2026
+- [x] FastAPI + LangChain Multi-Fallback AI-Chat — 2026
+- [x] Astro-Frontend komplett — 2026
 
 ---
 
 ## Blocked
 
-Tasks that cannot proceed without external input or a prerequisite.
-
-- [ ] TODO: blocked task — blocked by: [reason] — needs: [what is required to unblock]
+_Keine aktuell._
 
 ---
 
 ## Parking Lot
 
-Ideas and tasks that are not scheduled but should not be forgotten.
-
-- [ ] TODO: future idea or deferred task
-- [ ] TODO: future idea or deferred task
+- [ ] Blog-Sektion (KI-Engineering-Lernreise dokumentieren)
+- [ ] Analytics (Besucher-Tracking ohne Cookie-Banner, z.B. Plausible)
+- [ ] Kontaktformular (statt nur E-Mail-Link)
 
 ---
 
 ## Archive
-
-Move old completed tasks here to keep the Done section clean.
 
 <!-- Completed tasks older than ~2 weeks can be moved here -->
