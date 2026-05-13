@@ -8,89 +8,69 @@
 
 ## Last Updated
 
-- **Date:** TODO: YYYY-MM-DD HH:MM
-- **Updated by:** TODO: Claude Code / Codex / Gemini / human
-- **Handoff to:** TODO: Claude Code / Codex / Gemini / human / unspecified
+- **Date:** 2026-05-13
+- **Updated by:** Claude Code (Hub session)
+- **Handoff to:** unspecified
 
 ---
 
 ## Short Summary
 
-TODO: 2–3 sentences. What is the state of the project right now? What happened this session?
-
-Example: "Implemented the login form UI and wired it to the Supabase Auth signIn method. The form works but the redirect after login is broken — it goes to `/` instead of the intended `/dashboard`. This needs to be fixed next."
+Astro + FastAPI portfolio site. The last real feature work was a full narrative overhaul (projects, about, hero, nav sections), followed by an i18n fix for the `ueber-mich` ↔ `about` route in LanguagePicker. The repo is in sync with remote (no commits ahead). Only `.DS_Store` is uncommitted — not meaningful.
 
 ---
 
 ## Last Action
 
-TODO: what was the very last thing done before writing this handoff?
-
-Example: "Committed `src/components/LoginForm.tsx` and `src/app/login/page.tsx`. Tests not yet written."
+Fixed i18n: `LanguagePicker` now correctly maps `ueber-mich` ↔ `about` when switching language. Committed and pushed.
 
 ---
 
 ## Changed Files
 
-TODO: list all files modified, created, or deleted during this session.
-
 | File | Change type | Notes |
 |---|---|---|
-| TODO: path/to/file.ts | modified / created / deleted | brief reason |
+| `.DS_Store` | modified | macOS metadata — do not commit |
 
 ---
 
 ## Open Items
 
-TODO: what is incomplete, unverified, or intentionally left for the next session?
-
-- [ ] TODO: open item
-- [ ] TODO: open item
+- [ ] Decide next feature: AI chat improvement, new project entries, or content updates
+- [ ] Add `.DS_Store` to `.gitignore` if not already excluded
 
 ---
 
 ## Risks / Attention
 
-TODO: what could break? What areas are fragile? What should the next agent be careful about?
-
-Examples:
-- The auth middleware has not been updated — it may block the new login route
-- No error handling for network failures in the form
-- TypeScript strict mode may flag the optional chaining in `session.ts`
+- The AI chat feature (FastAPI backend) has a CV availability check — verify it still works after any content changes
+- i18n routing is manually mapped in `LanguagePicker` — any new routes must be added there explicitly
 
 ---
 
 ## Checks
 
-TODO: what was verified before ending the session?
-
 | Check | Status | Notes |
 |---|---|---|
-| `pnpm typecheck` | TODO: passed / failed / not run | TODO |
-| `pnpm test` | TODO: passed / failed / not run | TODO |
-| `pnpm lint` | TODO: passed / failed / not run | TODO |
-| Manual smoke test | TODO: done / not done | TODO |
+| Manual smoke test | done (last session) | i18n route switching works |
+| Build | not run this session | — |
 
 ---
 
 ## Next Concrete Action
 
-TODO: one specific, actionable instruction for the next agent.
-
-Example: "Fix the redirect in `src/app/login/page.tsx` — after successful sign-in, redirect to `/dashboard` instead of `/`. Then run `pnpm typecheck` and `pnpm test`."
+Open the live portfolio and review all pages for content gaps or UX issues. Then pick one: (a) add a missing project entry, or (b) improve the AI chat feature. Document the decision in `docs/ai/TASKS.md`.
 
 ---
 
 ## Ideal Next Prompt
 
-TODO: copy-paste ready prompt for the next agent. Include context so they can start immediately.
-
 ```
 Read docs/ai/HANDOFF.md, docs/ai/CURRENT.md, and docs/ai/PROJECT.md first.
 
-Current situation: [paste Short Summary here]
+Current situation: Portfolio is live and in sync with remote. Last work was a narrative overhaul + i18n fix. No active feature in progress.
 
-Your task: [paste Next Concrete Action here]
+Your task: Review the live portfolio, identify the highest-value improvement, add it to docs/ai/TASKS.md, and implement it.
 
 After completing the task, update docs/ai/CURRENT.md, docs/ai/TASKS.md, and docs/ai/HANDOFF.md.
 ```

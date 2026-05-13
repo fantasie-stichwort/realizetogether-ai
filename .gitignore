@@ -19,3 +19,15 @@ codebase.txt
 
 .agents/
 .superpowers/
+
+# Git Policy — auto-managed (git-policy.mjs)
+# Edit rules in: personal-assistant/docs/git-policy/registry.yml
+.claude/
+orchestration/current-state.md
+scratch.md
+scratchpad.md
+test-results/
+playwright-report/
+.env.local
+.env.*.local
+# End Git Policy
